@@ -1,0 +1,11 @@
+"address_bar.placeholder" = "Search or enter website name";
+"address_bar.add_bookmark" = "Add Bookmark";
+"address_bar.edit_bookmark" = "Edit Bookmark";
+"address_bar.add_to_favorites" = "Add to Favorites";
+"address_bar.no_addons" = "No Add-ons";
+"address_bar.manage_addons" = "Manage Add-ons";
+"address_bar.request_mobile_website" = "Request Mobile Website";
+"address_bar.request_desktop_website" = "Request Desktop Website";
+"address_bar.website_settings" = "Website Settings";
+"open_in.no_link" = "No link was provided.";
+"open_in.unable_to_open" = "Unable to open Reynard.";

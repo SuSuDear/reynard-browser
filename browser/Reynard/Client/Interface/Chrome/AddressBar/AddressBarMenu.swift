@@ -32,13 +32,13 @@ enum AddressBarMenu {
         let url = selectedURL.flatMap(URL.init(string:))
         if let url,
            url.host != nil {
-            let title = BookmarkStore.shared.bookmark(savedFor: url) == nil ? "Add Bookmark" : "Edit Bookmark"
+            let title = BookmarkStore.shared.bookmark(savedFor: url) == nil ? L10n.string("address_bar.add_bookmark") : L10n.string("address_bar.edit_bookmark")
             tabActions.append(UIAction(title: title, image: UIImage(named: "reynard.book")) { _ in
                 onBookmark(false)
             })
             
             if !BookmarkStore.shared.isSavedInFavorites(url) {
-                tabActions.append(UIAction(title: "Add to Favorites", image: UIImage(named: "reynard.star")) { _ in
+                tabActions.append(UIAction(title: L10n.string("address_bar.add_to_favorites"), image: UIImage(named: "reynard.star")) { _ in
                     onBookmark(true)
                 })
             }
@@ -48,7 +48,7 @@ enum AddressBarMenu {
         if addonItems.isEmpty {
             addonsChildren = [
                 UIAction(
-                    title: "No Add-ons",
+                    title: L10n.string("address_bar.no_addons"),
                     image: UIImage(named: "reynard.puzzlepiece.extension"),
                     attributes: .disabled
                 ) { _ in }
@@ -63,7 +63,7 @@ enum AddressBarMenu {
         
         var pageActions: [UIMenuElement] = [
             UIMenu(
-                title: "Manage Add-ons",
+                title: L10n.string("address_bar.manage_addons"),
                 image: UIImage(named: "reynard.puzzlepiece.extension"),
                 identifier: Identifier.manageAddonsMenu,
                 children: addonsChildren
@@ -71,7 +71,7 @@ enum AddressBarMenu {
         ]
         
         if let isDesktop = usesDesktopWebsite {
-            let title = isDesktop ? "Request Mobile Website" : "Request Desktop Website"
+            let title = isDesktop ? L10n.string("address_bar.request_mobile_website") : L10n.string("address_bar.request_desktop_website")
             let imageName = isDesktop ? "reynard.smartphone" : "reynard.desktopcomputer"
             pageActions.append(UIAction(title: title, image: UIImage(named: imageName)) { _ in
                 onChangeWebsiteMode()
@@ -80,7 +80,7 @@ enum AddressBarMenu {
         
         var settingsActions: [UIMenuElement] = []
         if url?.host != nil {
-            settingsActions.append(UIAction(title: "Website Settings", image: UIImage(named: "reynard.gear")) { _ in
+            settingsActions.append(UIAction(title: L10n.string("address_bar.website_settings"), image: UIImage(named: "reynard.gear")) { _ in
                 onWebsiteSettings()
             })
         }

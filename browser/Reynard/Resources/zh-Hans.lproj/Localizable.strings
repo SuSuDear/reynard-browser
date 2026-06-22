@@ -1,0 +1,11 @@
+"address_bar.placeholder" = "搜索或输入网站名称";
+"address_bar.add_bookmark" = "添加书签";
+"address_bar.edit_bookmark" = "编辑书签";
+"address_bar.add_to_favorites" = "添加到收藏";
+"address_bar.no_addons" = "没有附加组件";
+"address_bar.manage_addons" = "管理附加组件";
+"address_bar.request_mobile_website" = "请求移动版网站";
+"address_bar.request_desktop_website" = "请求桌面版网站";
+"address_bar.website_settings" = "网站设置";
+"open_in.no_link" = "未提供链接。";
+"open_in.unable_to_open" = "无法打开 Reynard。";

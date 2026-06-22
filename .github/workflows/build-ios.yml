@@ -249,7 +249,7 @@ jobs:
             xcodebuild "${XCBUILD_ARGS[@]}"
           fi
 
-      - name: Package .app into .ipa and .tipa
+      - name: Package .app into .tipa
         if: ${{ github.event_name == 'push' || inputs.run_xcodebuild }}
         working-directory: browser/build/Build/Products/Release-iphoneos
         env:
@@ -262,14 +262,11 @@ jobs:
             exit 1
           fi
 
-          # ---------- 1. Plain .ipa (no special entitlements) ----------
-          # AltStore/SideStore users will re-sign this with their Apple ID.
-          rm -rf Payload Reynard.ipa Reynard-TrollStore.tipa
+          rm -rf Payload Reynard-TrollStore.tipa
           mkdir Payload
           cp -R Reynard.app Payload/Reynard.app
-          zip -qry Reynard.ipa Payload -x "._*" -x ".DS_Store" -x "__MACOSX"
 
-          # ---------- 2. Compile the ptrace_jit helper binary ----------
+          # ---------- 1. Compile the ptrace_jit helper binary ----------
           # This tiny C helper requests JIT memory via ptrace tricks; it's
           # invoked by Reynard on launch when running under TrollStore.
           # Without it, the .tipa works but JIT is unavailable.
@@ -286,7 +283,7 @@ jobs:
             -o "$PTRACE_OUT"
           chmod 0755 "$PTRACE_OUT"
 
-          # ---------- 3. Inject .private entitlements with ldid ----------
+          # ---------- 2. Inject .private entitlements with ldid ----------
           # ldid replaces the existing ad-hoc signature with a new ad-hoc
           # signature that embeds these entitlements. TrollStore detects
           # them at install time and shows the "Special Permissions" prompt.
@@ -297,42 +294,29 @@ jobs:
           ldid -S"$PRIV_MAIN" "Payload/Reynard.app/Reynard"
           ldid -S"$PRIV_HELPER" "Payload/Reynard.app/PlugIns/Reynard Helper.appex/Reynard Helper"
 
-          # ---------- 4. Zip the TrollStore bundle ----------
+          # ---------- 3. Zip the TrollStore bundle ----------
           zip -qry Reynard-TrollStore.tipa Payload -x "._*" -x ".DS_Store" -x "__MACOSX"
 
-          ls -lh Reynard.ipa Reynard-TrollStore.tipa
-          # Sanity check: both bundles must be plausibly sized.
+          ls -lh Reynard-TrollStore.tipa
+          # Sanity check: the bundle must be plausibly sized.
           MIN_BYTES=$((10 * 1024 * 1024))
-          for f in Reynard.ipa Reynard-TrollStore.tipa; do
-            SIZE=$(stat -f%z "$f")
-            if [ "$SIZE" -lt "$MIN_BYTES" ]; then
-              echo "::error::$f is only ${SIZE} bytes — build likely produced an empty .app"
-              exit 1
-            fi
-          done
+          SIZE=$(stat -f%z "Reynard-TrollStore.tipa")
+          if [ "$SIZE" -lt "$MIN_BYTES" ]; then
+            echo "::error::Reynard-TrollStore.tipa is only ${SIZE} bytes — build likely produced an empty .app"
+            exit 1
+          fi
 
-          # ---------- 5. Verify the entitlements landed ----------
+          # ---------- 4. Verify the entitlements landed ----------
           echo "=== Entitlements embedded in Reynard binary ==="
           ldid -e "Payload/Reynard.app/Reynard" || true
           echo "=== Entitlements embedded in ptrace_jit binary ==="
           ldid -e "Payload/Reynard.app/ptrace_jit" || true
 
-      - name: Upload installable bundles (.ipa and .tipa)
+      - name: Upload TrollStore bundle (.tipa)
         if: ${{ github.event_name == 'push' || inputs.run_xcodebuild }}
         uses: actions/upload-artifact@v4
         with:
-          name: Reynard-unsigned-installable
-          path: |
-            browser/build/Build/Products/Release-iphoneos/Reynard.ipa
-            browser/build/Build/Products/Release-iphoneos/Reynard-TrollStore.tipa
+          name: Reynard-TrollStore-tipa
+          path: browser/build/Build/Products/Release-iphoneos/Reynard-TrollStore.tipa
           if-no-files-found: error
           retention-days: 14
-
-      - name: Upload raw .app bundle (for debugging)
-        if: ${{ github.event_name == 'push' || inputs.run_xcodebuild }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: Reynard-unsigned-app
-          path: browser/build/Build/Products/Release-iphoneos/Reynard.app
-          if-no-files-found: warn
-          retention-days: 7
