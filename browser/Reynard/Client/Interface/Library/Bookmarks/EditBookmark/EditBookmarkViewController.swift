@@ -69,7 +69,7 @@ final class EditBookmarkViewController: UIViewController, UITableViewDataSource,
         textField.clearButtonMode = .whileEditing
         textField.font = .preferredFont(forTextStyle: .body)
         textField.adjustsFontForContentSizeCategory = true
-        textField.placeholder = "Title"
+        textField.placeholder = L10n.string("bookmarks.edit.title_placeholder")
         textField.text = bookmark?.title ?? draftTitle
         textField.delegate = self
         textField.addTarget(self, action: #selector(validateSaveButton), for: .editingChanged)
@@ -86,7 +86,7 @@ final class EditBookmarkViewController: UIViewController, UITableViewDataSource,
         textField.autocapitalizationType = .none
         textField.autocorrectionType = .no
         textField.keyboardType = .URL
-        textField.placeholder = "URL"
+        textField.placeholder = L10n.string("bookmarks.edit.url_placeholder")
         textField.text = bookmark?.url.absoluteString ?? draftURL?.absoluteString
         textField.delegate = self
         textField.addTarget(self, action: #selector(validateSaveButton), for: .editingChanged)
@@ -126,7 +126,7 @@ final class EditBookmarkViewController: UIViewController, UITableViewDataSource,
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = limitsToFavorites ? "Add to Favorites" : (bookmark == nil ? "Add Bookmark" : "Edit Bookmark")
+        title = limitsToFavorites ? L10n.string("address_bar.add_to_favorites") : (bookmark == nil ? L10n.string("address_bar.add_bookmark") : L10n.string("address_bar.edit_bookmark"))
         view.backgroundColor = .systemGroupedBackground
         navigationItem.largeTitleDisplayMode = .never
         
@@ -141,7 +141,7 @@ final class EditBookmarkViewController: UIViewController, UITableViewDataSource,
                 navigationItem.leftBarButtonItems?.first?.tintColor = .label
             }
         } else {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Save", style: .done, target: self, action: #selector(saveBookmark))
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: L10n.string("common.save"), style: .done, target: self, action: #selector(saveBookmark))
         }
         
         view.addSubview(tableView)
@@ -206,7 +206,7 @@ final class EditBookmarkViewController: UIViewController, UITableViewDataSource,
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        section == 2 ? "Location" : nil
+        section == 2 ? L10n.string("bookmarks.edit.location") : nil
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -255,7 +255,7 @@ final class EditBookmarkViewController: UIViewController, UITableViewDataSource,
             let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
             cell.backgroundColor = .secondarySystemGroupedBackground
             cell.tintColor = .systemBlue
-            cell.textLabel?.text = "New Folder"
+            cell.textLabel?.text = L10n.string("bookmarks.new_folder")
             cell.textLabel?.textColor = .systemBlue
             cell.imageView?.image = UIImage(named: "reynard.folder.badge.plus")?.withRenderingMode(.alwaysTemplate)
             return cell
