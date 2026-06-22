@@ -26,6 +26,9 @@ rm -f "$FIREFOX_DIR/.mozconfig"
 	echo "ac_add_options --enable-optimize"
 	echo "ac_add_options --disable-debug"
 	echo "ac_add_options --disable-tests"
+	# Disable wasm-sandboxed libraries: GitHub macOS runners do not provide
+	# a WASI-capable clang/sysroot for wasm32-wasi during Gecko configure.
+	echo "ac_add_options --without-wasm-sandboxed-libraries"
 } > "$FIREFOX_DIR/.mozconfig"
 
 if ! rustup target list | grep -q "^$TARGET (installed)"; then
