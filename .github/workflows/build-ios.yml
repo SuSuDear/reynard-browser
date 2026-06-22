@@ -275,7 +275,7 @@ jobs:
           # Without it, the .tipa works but JIT is unavailable.
           CLANG_PATH="$(xcrun --sdk iphoneos --find clang)"
           SDK_PATH="$(xcrun --sdk iphoneos --show-sdk-path)"
-          PTRACE_SRC="$ROOT_DIR/browser/Reynard/TrollStore/JIT/ptrace_jit.c"
+          PTRACE_SRC="$ROOT_DIR/browser/Reynard/JIT/Unsandboxed/ptrace_jit.c"
           PTRACE_OUT="Payload/Reynard.app/ptrace_jit"
           "$CLANG_PATH" \
             -arch arm64 \
@@ -292,7 +292,7 @@ jobs:
           # them at install time and shows the "Special Permissions" prompt.
           PRIV_MAIN="$ROOT_DIR/browser/Reynard/Entitlements/Reynard.private.entitlements"
           PRIV_HELPER="$ROOT_DIR/browser/Helper/Entitlements/Reynard-Helper.private.entitlements"
-          PRIV_PTRACE="$ROOT_DIR/browser/Reynard/TrollStore/JIT/ptrace_jit.entitlements"
+          PRIV_PTRACE="$ROOT_DIR/browser/Reynard/JIT/Unsandboxed/ptrace_jit.entitlements"
           ldid -S"$PRIV_PTRACE" "$PTRACE_OUT"
           ldid -S"$PRIV_MAIN" "Payload/Reynard.app/Reynard"
           ldid -S"$PRIV_HELPER" "Payload/Reynard.app/PlugIns/Reynard Helper.appex/Reynard Helper"
