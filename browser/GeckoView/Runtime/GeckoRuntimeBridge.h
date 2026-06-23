@@ -13,6 +13,7 @@
 @interface GeckoRuntimeBridge : NSObject
 
 + (NSString *)version;
++ (void)setAcceptLanguages:(NSString *)value;
 
 @end
 

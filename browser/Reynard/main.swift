@@ -47,4 +47,12 @@ if #unavailable(iOS 14.0),
    getEntitlementValue("com.apple.private.security.no-sandbox") {
     configureUnsandboxedAppDataDirectories()
 }
+
+let preferredLocalization = Bundle.main.preferredLocalizations.first ?? "en"
+if preferredLocalization == "zh-Hans" {
+    GeckoRuntimeBridge.setAcceptLanguages("zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7")
+} else {
+    GeckoRuntimeBridge.setAcceptLanguages("en-US,en;q=0.9")
+}
+
 GeckoRuntime.main(argc: CommandLine.argc, argv: CommandLine.unsafeArgv)
