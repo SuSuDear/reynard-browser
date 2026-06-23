@@ -525,13 +525,23 @@ final class BookmarksViewController: UIViewController, UITableViewDataSource, UI
     private func reloadFolder() {
         let snapshot = store.contents(of: folderID)
         sections = makeBookmarkSections(from: snapshot.items)
-        title = snapshot.parent.title
+        title = localizedFolderTitle(snapshot.parent)
         updateEmptyState()
         tableView.reloadData()
     }
     
     private func updateEmptyState() {
         tableView.backgroundView = sections.isEmpty && !query.isEmpty ? emptyLabel : nil
+    }
+
+    private func localizedFolderTitle(_ folder: BookmarkFolderSnapshot) -> String {
+        if folder.parentGUID == nil {
+            return L10n.string("bookmarks.title")
+        }
+        if folder.guid == "favorites___" {
+            return L10n.string("bookmarks.favorites")
+        }
+        return folder.title
     }
     
     private func makeBookmarkSections(from newItems: [BookmarkContentSnapshot]) -> [(title: String, items: [BookmarkContentSnapshot])] {
