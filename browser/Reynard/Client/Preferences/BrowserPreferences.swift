@@ -6,9 +6,56 @@
 //
 
 import Foundation
+import GeckoView
 import UIKit
 
 typealias Prefs = BrowserPreferences
+
+enum WebLanguage: String, CaseIterable {
+    case system
+    case chinese
+    case english
+
+    var displayName: String {
+        switch self {
+        case .system:
+            return L10n.string("settings.browsing.web_language.system")
+        case .chinese:
+            return L10n.string("settings.browsing.web_language.chinese")
+        case .english:
+            return L10n.string("settings.browsing.web_language.english")
+        }
+    }
+
+    var acceptLanguages: String? {
+        switch self {
+        case .system:
+            return nil
+        case .chinese:
+            return "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7"
+        case .english:
+            return "en-US,en;q=0.9"
+        }
+    }
+
+    func applyGeckoPreference() {
+        if let acceptLanguages {
+            GeckoEventDispatcherWrapper.runtimeInstance.dispatch(
+                type: "GeckoView:Preferences:SetPref",
+                message: [
+                    "name": "intl.accept_languages",
+                    "type": "string",
+                    "value": acceptLanguages,
+                ]
+            )
+        } else {
+            GeckoEventDispatcherWrapper.runtimeInstance.dispatch(
+                type: "GeckoView:Preferences:ClearPref",
+                message: ["name": "intl.accept_languages"]
+            )
+        }
+    }
+}
 
 final class BrowserPreferences {
     static var shared = BrowserPreferences()
@@ -44,6 +91,7 @@ final class BrowserPreferences {
             
             // Browsing
             key("BrowsingSettings", "requestDesktopWebsite"): UIDevice.current.userInterfaceIdiom == .pad,
+            key("BrowsingSettings", "webLanguage"): WebLanguage.system.rawValue,
             
             // Appearance
             key("AppearanceSettings", "addressBarPosition"): BrowserChromePosition.bottom.rawValue,
@@ -123,6 +171,17 @@ final class BrowserPreferences {
             }
             set {
                 prefs.set(newValue, forSetting: "BrowsingSettings", key: "requestDesktopWebsite")
+            }
+        }
+
+        static var webLanguage: WebLanguage {
+            get {
+                let rawValue = prefs.string(forSetting: "BrowsingSettings", key: "webLanguage") ?? WebLanguage.system.rawValue
+                return WebLanguage(rawValue: rawValue) ?? .system
+            }
+            set {
+                prefs.set(newValue.rawValue, forSetting: "BrowsingSettings", key: "webLanguage")
+                newValue.applyGeckoPreference()
             }
         }
     }
