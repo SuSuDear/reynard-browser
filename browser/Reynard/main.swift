@@ -47,5 +47,9 @@ if #unavailable(iOS 14.0),
    getEntitlementValue("com.apple.private.security.no-sandbox") {
     configureUnsandboxedAppDataDirectories()
 }
-Prefs.BrowsingSettings.webLanguage.applyGeckoPreference()
+GeckoEventDispatcherWrapper.setPreference(
+    name: "intl.accept_languages",
+    type: "string",
+    value: "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7"
+)
 GeckoRuntime.main(argc: CommandLine.argc, argv: CommandLine.unsafeArgv)

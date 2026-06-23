@@ -68,10 +68,6 @@
 "settings.appearance.position.top" = "顶部";
 "settings.browsing.request_desktop_on" = "请求桌面网站";
 "settings.browsing.all_websites" = "所有网站";
-"settings.browsing.web_language.system" = "跟随系统/默认";
-"settings.browsing.web_language.chinese" = "中文优先";
-"settings.browsing.web_language.english" = "英文优先";
-"settings.browsing.web_language.footer" = "选择发送给网站的首选语言。更改后，已打开的页面可能需要刷新才会生效。";
 "settings.search.engine" = "搜索引擎";
 "settings.search.custom_template_footer" = "输入 URL，并用 %s 表示查询词";
 "settings.search.custom_template_valid_footer" = "%@。当前值必须是有效的 http(s) URL。";

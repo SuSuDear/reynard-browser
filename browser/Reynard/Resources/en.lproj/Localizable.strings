@@ -68,10 +68,6 @@
 "settings.appearance.position.top" = "Top";
 "settings.browsing.request_desktop_on" = "Request Desktop Website On";
 "settings.browsing.all_websites" = "All Websites";
-"settings.browsing.web_language.system" = "Follow System / Default";
-"settings.browsing.web_language.chinese" = "Chinese First";
-"settings.browsing.web_language.english" = "English First";
-"settings.browsing.web_language.footer" = "Choose the preferred language sent to websites. Open pages may need to be refreshed after changing this setting.";
 "settings.search.engine" = "Search Engine";
 "settings.search.custom_template_footer" = "Enter URL with %s in place of query";
 "settings.search.custom_template_valid_footer" = "%@. The current value must be a valid http(s) URL.";
