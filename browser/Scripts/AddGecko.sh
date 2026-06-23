@@ -29,7 +29,13 @@ rsync -pvtrlL --delete --exclude "XUL" --exclude "*.dylib" --exclude "Test*" --e
 
 # default theme missing error fix
 mkdir -p "${GECKOVIEW_FW_FRAMEWORKS}/default-theme"
-cp -RfL "${DEFAULT_THEME_SRC}/" "${GECKOVIEW_FW_FRAMEWORKS}/default-theme/"
+if [ -d "${DEFAULT_THEME_SRC}" ]; then
+	cp -RfL "${DEFAULT_THEME_SRC}/" "${GECKOVIEW_FW_FRAMEWORKS}/default-theme/"
+elif [ -d "${GECKO_DIST_BIN}/default-theme" ]; then
+	cp -RfL "${GECKO_DIST_BIN}/default-theme/" "${GECKOVIEW_FW_FRAMEWORKS}/default-theme/"
+else
+	echo "warning: default-theme not found in Firefox source or Gecko dist" >&2
+fi
 echo "resource default-theme file:default-theme/" >> "${GECKOVIEW_FW_FRAMEWORKS}/chrome.manifest"
 
 # sign the GeckoView.framework
