@@ -350,3 +350,8 @@
 "tab_overview.tab_count.one" = "%d Tab";
 "tab_overview.tab_count.other" = "%d Tabs";
 "tab_overview.zero_tabs" = "0 Tabs";
+"downloads.confirm_download" = "Do you want to download \"%@\"?";
+"downloads.download" = "Download";
+"select_picker.select_options" = "Select Options";
+"search.visited" = "%@ · Visited %@";
+"search.opened_tab" = "%@ · Opened Tab";

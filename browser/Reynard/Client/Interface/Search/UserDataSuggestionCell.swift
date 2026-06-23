@@ -104,10 +104,10 @@ final class UserDataSuggestionCell: UITableViewCell {
             sourceIconView.image = UIImage(named: "reynard.book")
         case .history:
             let relativeDate = Self.relativeDateFormatter.localizedString(for: result.lastVisitedAt ?? Date(), relativeTo: Date())
-            subtitleLabel.text = "\(URLUtils.hostDisplayString(for: result.url)) · Visited \(relativeDate)"
+            subtitleLabel.text = L10n.string("search.visited", URLUtils.hostDisplayString(for: result.url), relativeDate)
             sourceIconView.image = UIImage(named: "reynard.clock")
         case .tab:
-            subtitleLabel.text = "\(URLUtils.hostDisplayString(for: result.url)) · Opened Tab"
+            subtitleLabel.text = L10n.string("search.opened_tab", URLUtils.hostDisplayString(for: result.url))
             sourceIconView.image = UIImage(named: "reynard.square.on.square")
         }
         

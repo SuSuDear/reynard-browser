@@ -350,3 +350,8 @@
 "tab_overview.tab_count.one" = "%d 个标签页";
 "tab_overview.tab_count.other" = "%d 个标签页";
 "tab_overview.zero_tabs" = "0 个标签页";
+"downloads.confirm_download" = "要下载“%@”吗？";
+"downloads.download" = "下载";
+"select_picker.select_options" = "选择多个选项";
+"search.visited" = "%@ · 访问于 %@";
+"search.opened_tab" = "%@ · 已打开的标签页";

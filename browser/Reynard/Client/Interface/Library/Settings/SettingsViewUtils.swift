@@ -63,8 +63,8 @@ enum SettingsViewUtils {
         
         alert.view.addSubview(progressView)
         
-        let cancelAnchorView = alert.view.firstDescendantButton(withTitle: "Cancel") ??
-        alert.view.firstDescendantView(containingLabelText: "Cancel")
+        let cancelAnchorView = alert.view.firstDescendantButton(withTitle: L10n.string("common.cancel")) ??
+        alert.view.firstDescendantView(containingLabelText: L10n.string("common.cancel"))
         var constraints = [
             progressView.widthAnchor.constraint(equalTo: messageLabel.widthAnchor),
             progressView.centerXAnchor.constraint(equalTo: messageLabel.centerXAnchor),
