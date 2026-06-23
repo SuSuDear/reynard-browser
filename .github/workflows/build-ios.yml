@@ -34,6 +34,10 @@ on:
         type: boolean
         default: true
 
+permissions:
+  contents: read
+  actions: read
+
 jobs:
   build:
     name: Build Reynard.app
@@ -42,6 +46,9 @@ jobs:
 
     env:
       FIREFOX_RELEASE_TAG_FILE: engine/release.txt
+      USE_PREBUILT_GECKO: 'true'
+      GECKO_ARTIFACT_URL: https://api.github.com/repos/SuSuDear/gecko-ios-builder/actions/artifacts/7816848696/zip
+      GECKO_ARTIFACT_SHA256: 8c09521800cad1408c6773bda67b6b93f87190a4142ccdd0df83b2410abd68e5
       # Firefox 151's mobile/ios target requires iOS SDK >= 26.4, which only
       # ships in Xcode 26+. macos-26 runner has Xcode 26.4.1 as default.
       MACH_BUILD_PYTHON_NATIVE_PACKAGE_SOURCE: system
@@ -96,6 +103,7 @@ jobs:
           python3 -m pip install zstandard
 
       - name: Cache Firefox source submodule
+        if: ${{ env.USE_PREBUILT_GECKO != 'true' }}
         id: cache-firefox-src
         uses: actions/cache@v4
         with:
@@ -117,11 +125,12 @@ jobs:
           git submodule update --init --depth 1 support/idevice
 
       - name: Fetch and checkout Firefox source if cache miss
-        if: steps.cache-firefox-src.outputs.cache-hit != 'true'
+        if: ${{ env.USE_PREBUILT_GECKO != 'true' && steps.cache-firefox-src.outputs.cache-hit != 'true' }}
         run: |
           ./tools/development/update-gecko.sh
 
       - name: Apply patches to Firefox source
+        if: ${{ env.USE_PREBUILT_GECKO != 'true' }}
         run: |
           # apply-patches.sh is interactive on conflict. In CI, we want a
           # failure to be loud rather than block on stdin, so guard the
@@ -145,6 +154,7 @@ jobs:
             cargo-${{ runner.os }}-
 
       - name: Install Rust-based build tools (cbindgen)
+        if: ${{ env.USE_PREBUILT_GECKO != 'true' }}
         # cbindgen generates C headers from Rust sources during Gecko configure.
         # `mach bootstrap` normally provides it, but we skip bootstrap to avoid
         # downloading ~3 GB of Android NDK/SDK we don't need. Placed AFTER the
@@ -160,7 +170,7 @@ jobs:
           ./tools/development/build-idevice.sh
 
       - name: Cache Gecko build directory
-        if: ${{ github.event_name == 'push' || inputs.run_gecko_build }}
+        if: ${{ env.USE_PREBUILT_GECKO != 'true' && (github.event_name == 'push' || inputs.run_gecko_build) }}
         id: cache-gecko-build
         uses: actions/cache@v4
         with:
@@ -175,7 +185,7 @@ jobs:
             gecko-build-${{ runner.os }}-${{ steps.gecko-tag.outputs.tag }}-
 
       - name: Fetch Mozilla toolchain artifacts (clang + friends)
-        if: ${{ github.event_name == 'push' || inputs.run_gecko_build }}
+        if: ${{ env.USE_PREBUILT_GECKO != 'true' && (github.event_name == 'push' || inputs.run_gecko_build) }}
         working-directory: engine/firefox
         run: |
           # We skip `./mach bootstrap` entirely because:
@@ -193,12 +203,12 @@ jobs:
           ./mach configure 2>&1 | tail -200
 
       - name: Build Gecko engine
-        if: ${{ github.event_name == 'push' || inputs.run_gecko_build }}
+        if: ${{ env.USE_PREBUILT_GECKO != 'true' && (github.event_name == 'push' || inputs.run_gecko_build) }}
         run: |
           ./tools/development/build-gecko.sh
 
       - name: Inspect Gecko output
-        if: ${{ github.event_name == 'push' || inputs.run_gecko_build }}
+        if: ${{ env.USE_PREBUILT_GECKO != 'true' && (github.event_name == 'push' || inputs.run_gecko_build) }}
         run: |
           OBJDIR="engine/firefox/obj-aarch64-apple-ios"
           if [ ! -d "$OBJDIR/dist/bin" ]; then
@@ -206,6 +216,45 @@ jobs:
             exit 1
           fi
           echo "Gecko dist/bin contents:"
+          ls -la "$OBJDIR/dist/bin" | head -40
+
+      - name: Download and extract prebuilt Gecko dist
+        if: ${{ env.USE_PREBUILT_GECKO == 'true' }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p _gecko-artifact
+          curl --fail --location \
+            --header "Authorization: Bearer $GITHUB_TOKEN" \
+            --header "Accept: application/vnd.github+json" \
+            "$GECKO_ARTIFACT_URL" \
+            --output _gecko-artifact/gecko-ios-aarch64-dist.zip
+
+          ACTUAL_SHA256="$(shasum -a 256 _gecko-artifact/gecko-ios-aarch64-dist.zip | awk '{print $1}')"
+          if [ "$ACTUAL_SHA256" != "$GECKO_ARTIFACT_SHA256" ]; then
+            echo "::error::Unexpected Gecko artifact sha256: $ACTUAL_SHA256"
+            exit 1
+          fi
+
+          unzip -q _gecko-artifact/gecko-ios-aarch64-dist.zip -d _gecko-artifact
+          ARTIFACT="_gecko-artifact/gecko-ios-aarch64-dist.tar.zst"
+          if [ ! -f "$ARTIFACT" ]; then
+            echo "::error::Missing $ARTIFACT inside downloaded workflow artifact"
+            find _gecko-artifact -maxdepth 2 -type f -print
+            exit 1
+          fi
+
+          OBJDIR="engine/firefox/obj-aarch64-apple-ios"
+          rm -rf "$OBJDIR/dist"
+          mkdir -p "$OBJDIR"
+          tar --zstd -xf "$ARTIFACT" -C "$OBJDIR"
+
+          if [ ! -d "$OBJDIR/dist/bin" ]; then
+            echo "::error::Downloaded Gecko artifact did not produce $OBJDIR/dist/bin"
+            exit 1
+          fi
+          echo "Prebuilt Gecko dist/bin contents:"
           ls -la "$OBJDIR/dist/bin" | head -40
 
       - name: Run xcodebuild (unsigned)
