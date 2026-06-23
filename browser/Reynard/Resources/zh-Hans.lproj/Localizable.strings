@@ -335,7 +335,7 @@
 
 "web_prompt.confirm_upload" = "确认上传";
 "web_prompt.folder_upload_all" = "确定要上传所有文件吗？只有在你信任该网站时才这样做。";
-"web_prompt.folder_upload_named" = "确定要上传 "%@" 中的所有文件吗？只有在你信任该网站时才这样做。";
+"web_prompt.folder_upload_named" = "确定要上传 \"%@\" 中的所有文件吗？只有在你信任该网站时才这样做。";
 "web_prompt.upload" = "上传";
 "clear_data.clear_timeframe" = "清除时间范围";
 "clear_data.downloads_footer" = "清除下载历史不会删除“下载”文件夹中的文件。";

@@ -335,7 +335,7 @@
 
 "web_prompt.confirm_upload" = "Confirm Upload";
 "web_prompt.folder_upload_all" = "Are you sure you want to upload all files? Only do this if you trust the site.";
-"web_prompt.folder_upload_named" = "Are you sure you want to upload all files from "%@"? Only do this if you trust the site.";
+"web_prompt.folder_upload_named" = "Are you sure you want to upload all files from \"%@\"? Only do this if you trust the site.";
 "web_prompt.upload" = "Upload";
 "clear_data.clear_timeframe" = "Clear Timeframe";
 "clear_data.downloads_footer" = "Clearing downloads history does not delete files in your Downloads folder.";
