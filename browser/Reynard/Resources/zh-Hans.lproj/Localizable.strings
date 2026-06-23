@@ -377,3 +377,16 @@
 "file_name.photo" = "照片";
 "file_name.file" = "文件";
 "file_name.photo_jpg" = "照片.jpg";
+"jit.error.unknown" = "未知错误。";
+"jit.failure.title" = "启用 JIT 失败";
+"jit.failure.activate_jitless" = "启用 JIT-Less 模式";
+"jit.failure.ptrace_message" = "遇到此问题非常罕见！请确保你的 TrollStore 安装或越狱环境已正确配置。\n\n你可以启用 JIT-Less 模式，在下次启动前暂时不使用 JIT 继续浏览。";
+"jit.failure.pairing_message" = "请检查配对文件是否有效、回环 VPN 是否已开启，并确认你已连接到稳定的 Wi-Fi 网络。\n\n你可以启用 JIT-Less 模式，在下次启动前暂时不使用 JIT 继续浏览。";
+"jit.failure.missing_ddi_error" = "缺少所需的 DDI 文件。";
+"jit.failure.missing_ddi_message" = "未找到启用 JIT 所需的 Developer Disk Image 文件。\n\nJIT 已被禁用。请使用下方按钮退出 App，然后在浏览器设置中重新启用 JIT。";
+"jit.failure.quit_reynard" = "退出 Reynard";
+"jit.failure.error_format" = "错误 %d：%@";
+"jit.ddi.already_in_progress" = "Developer Disk Image 下载已在进行中。";
+"jit.ddi.cancelled" = "Developer Disk Image 下载已取消。";
+"jit.ddi.app_support_unavailable" = "无法访问 App 的 Application Support 目录。";
+"jit.ddi.invalid_remote_url" = "Developer Disk Image 源 URL 无效。";

@@ -377,3 +377,16 @@
 "file_name.photo" = "Photo";
 "file_name.file" = "File";
 "file_name.photo_jpg" = "photo.jpg";
+"jit.error.unknown" = "Unknown error.";
+"jit.failure.title" = "Failed to enable JIT";
+"jit.failure.activate_jitless" = "Activate JIT-Less Mode";
+"jit.failure.ptrace_message" = "It's extremely rare that you encounter this issue! Make sure that your TrollStore installation or jailbroken environment is properly configured.\n\nYou may use the browser without JIT temporarily until the next launch by activating JIT-Less Mode.";
+"jit.failure.pairing_message" = "Please check that your pairing file is valid, your loopback VPN is on, and you're connected to a stable Wi-Fi network.\n\nYou may use the browser without JIT temporarily until the next launch by activating JIT-Less Mode.";
+"jit.failure.missing_ddi_error" = "Required DDI files are missing.";
+"jit.failure.missing_ddi_message" = "The required Developer Disk Image files for enabling JIT were not found.\n\nJIT has been disabled. Quit the app using the button below, then re-enable JIT from the browser settings.";
+"jit.failure.quit_reynard" = "Quit Reynard";
+"jit.failure.error_format" = "Error %d: %@";
+"jit.ddi.already_in_progress" = "A Developer Disk Image download is already in progress.";
+"jit.ddi.cancelled" = "Developer Disk Image download was cancelled.";
+"jit.ddi.app_support_unavailable" = "Unable to access the app Application Support directory.";
+"jit.ddi.invalid_remote_url" = "Developer Disk Image source URL is invalid.";

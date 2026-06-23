@@ -238,21 +238,21 @@ final class JITController {
             return
         }
         
-        let description = error.localizedDescription.isEmpty ? "Unknown error." : error.localizedDescription
+        let description = error.localizedDescription.isEmpty ? L10n.string("jit.error.unknown") : error.localizedDescription
         let messageText: String
         if usePtraceJIT() {
-            messageText = "It's extremely rare that you encounter this issue! Make sure that your TrollStore installation or jailbroken environment is properly configured.\n\nYou may use the browser without JIT temporarily until the next launch by activating JIT-Less Mode."
+            messageText = L10n.string("jit.failure.ptrace_message")
         } else {
-            messageText = "Please check that your pairing file is valid, your loopback VPN is on, and you're connected to a stable Wi-Fi network.\n\nYou may use the browser without JIT temporarily until the next launch by activating JIT-Less Mode."
+            messageText = L10n.string("jit.failure.pairing_message")
         }
         
         let viewController = JITFailureViewController(
             errorCode: error.code,
             errorDescription: description,
             showsErrorDetails: showsErrorDetails,
-            titleText: "Failed to enable JIT",
+            titleText: L10n.string("jit.failure.title"),
             messageText: messageText,
-            actionButtonTitle: "Activate JIT-Less Mode",
+            actionButtonTitle: L10n.string("jit.failure.activate_jitless"),
             onPrimaryAction: { [weak self] in
                 self?.activateJITLessMode()
             }
@@ -283,11 +283,11 @@ final class JITController {
         
         let viewController = JITFailureViewController(
             errorCode: Int(ENOENT),
-            errorDescription: "Required DDI files are missing.",
+            errorDescription: L10n.string("jit.failure.missing_ddi_error"),
             showsErrorDetails: false,
-            titleText: "Failed to enable JIT",
-            messageText: "The required Developer Disk Image files for enabling JIT were not found.\n\nJIT has been disabled. Quit the app using the button below, then re-enable JIT from the browser settings.",
-            actionButtonTitle: "Quit Reynard",
+            titleText: L10n.string("jit.failure.title"),
+            messageText: L10n.string("jit.failure.missing_ddi_message"),
+            actionButtonTitle: L10n.string("jit.failure.quit_reynard"),
             onPrimaryAction: {
                 self.disableJITAndQuit()
             }
