@@ -283,6 +283,13 @@ jobs:
           # We previously set CODE_SIGN_IDENTITY="" with || true masking the
           # error — that produced an unusable .app whose extensions failed to
           # match. The fix: ad-hoc sign everything, no error masking.
+          BROWSER_DIR="$PWD"
+          GECKO_HEADER_SEARCH_PATHS="\$(inherited) $GECKO_DIST/include $GECKO_DIST/include/GeckoView $BROWSER_DIR/GeckoView"
+          GECKO_OTHER_SWIFT_FLAGS="\$(inherited) -Xcc -I$GECKO_DIST/include -Xcc -I$GECKO_DIST/include/GeckoView -Xcc -I$BROWSER_DIR/GeckoView"
+          echo "Using Gecko header search paths: $GECKO_HEADER_SEARCH_PATHS"
+          test -f "$GECKO_DIST/include/GeckoView/GeckoViewSwiftSupport.h"
+          test -f "$GECKO_DIST/include/GeckoView/IOSBootstrap.h"
+
           XCBUILD_ARGS=(
             -project Reynard.xcodeproj
             -scheme Reynard
@@ -299,6 +306,9 @@ jobs:
             PROVISIONING_PROFILE_SPECIFIER=""
             EXPANDED_CODE_SIGN_IDENTITY="-"
             GECKO_DIST="$GECKO_DIST"
+            HEADER_SEARCH_PATHS="$GECKO_HEADER_SEARCH_PATHS"
+            USER_HEADER_SEARCH_PATHS="$GECKO_HEADER_SEARCH_PATHS"
+            OTHER_SWIFT_FLAGS="$GECKO_OTHER_SWIFT_FLAGS"
           )
           if command -v xcbeautify >/dev/null 2>&1; then
             xcodebuild "${XCBUILD_ARGS[@]}" | xcbeautify
