@@ -355,3 +355,17 @@
 "select_picker.select_options" = "选择多个选项";
 "search.visited" = "%@ · 访问于 %@";
 "search.opened_tab" = "%@ · 已打开的标签页";
+"date_section.today" = "今天";
+"date_section.yesterday" = "昨天";
+"date_section.previous_7_days" = "过去 7 天";
+"date_section.previous_30_days" = "过去 30 天";
+"downloads.unknown_size" = "未知大小";
+"downloads.deleted" = "已删除";
+"context_menu.share_image" = "分享图片";
+"context_menu.save_to_photos" = "保存到照片";
+"common.copy" = "复制";
+"context_menu.open_new_tab" = "在新标签页打开";
+"context_menu.open_new_private_tab" = "在新隐私标签页打开";
+"context_menu.copy_link" = "复制链接";
+"context_menu.share_link" = "分享链接";
+"common.homepage" = "主页";

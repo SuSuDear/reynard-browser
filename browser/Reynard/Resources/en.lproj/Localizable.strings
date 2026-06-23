@@ -355,3 +355,17 @@
 "select_picker.select_options" = "Select Options";
 "search.visited" = "%@ · Visited %@";
 "search.opened_tab" = "%@ · Opened Tab";
+"date_section.today" = "Today";
+"date_section.yesterday" = "Yesterday";
+"date_section.previous_7_days" = "Previous 7 Days";
+"date_section.previous_30_days" = "Previous 30 Days";
+"downloads.unknown_size" = "Unknown size";
+"downloads.deleted" = "Deleted";
+"context_menu.share_image" = "Share Image";
+"context_menu.save_to_photos" = "Save to Photos";
+"common.copy" = "Copy";
+"context_menu.open_new_tab" = "Open in New Tab";
+"context_menu.open_new_private_tab" = "Open in New Private Tab";
+"context_menu.copy_link" = "Copy Link";
+"context_menu.share_link" = "Share Link";
+"common.homepage" = "Homepage";

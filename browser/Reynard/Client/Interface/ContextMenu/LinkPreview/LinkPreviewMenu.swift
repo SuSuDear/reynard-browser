@@ -31,16 +31,16 @@ struct LinkPreviewMenu {
             return viewController
         } actionProvider: { _ in
             UIMenu(title: "", children: [
-                UIAction(title: "Open in New Tab", image: UIImage(named: "reynard.plus.square.on.square")) { _ in
+                UIAction(title: L10n.string("context_menu.open_new_tab"), image: UIImage(named: "reynard.plus.square.on.square")) { _ in
                     openInNewTab()
                 },
-                UIAction(title: "Open in New Private Tab", image: UIImage(named: "reynard.plus.square.on.square")) { _ in
+                UIAction(title: L10n.string("context_menu.open_new_private_tab"), image: UIImage(named: "reynard.plus.square.on.square")) { _ in
                     openInNewPrivateTab()
                 },
-                UIAction(title: "Copy Link", image: UIImage(named: "reynard.document.on.document")) { _ in
+                UIAction(title: L10n.string("context_menu.copy_link"), image: UIImage(named: "reynard.document.on.document")) { _ in
                     UIPasteboard.general.string = url.absoluteString
                 },
-                UIAction(title: "Share Link", image: UIImage(named: "reynard.square.and.arrow.up")) { _ in
+                UIAction(title: L10n.string("context_menu.share_link"), image: UIImage(named: "reynard.square.and.arrow.up")) { _ in
                     shareLink(url)
                 },
             ])

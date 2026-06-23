@@ -71,16 +71,16 @@ extension DownloadSection {
         previousThirtyDayItems: [DownloadItemSnapshot]
     ) {
         if !todayItems.isEmpty {
-            sections.append(DownloadSection(title: "Today", items: todayItems))
+            sections.append(DownloadSection(title: L10n.string("date_section.today"), items: todayItems))
         }
         if !yesterdayItems.isEmpty {
-            sections.append(DownloadSection(title: "Yesterday", items: yesterdayItems))
+            sections.append(DownloadSection(title: L10n.string("date_section.yesterday"), items: yesterdayItems))
         }
         if !previousSevenDayItems.isEmpty {
-            sections.append(DownloadSection(title: "Previous 7 Days", items: previousSevenDayItems))
+            sections.append(DownloadSection(title: L10n.string("date_section.previous_7_days"), items: previousSevenDayItems))
         }
         if !previousThirtyDayItems.isEmpty {
-            sections.append(DownloadSection(title: "Previous 30 Days", items: previousThirtyDayItems))
+            sections.append(DownloadSection(title: L10n.string("date_section.previous_30_days"), items: previousThirtyDayItems))
         }
     }
     
