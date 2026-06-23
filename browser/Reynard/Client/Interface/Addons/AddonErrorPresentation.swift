@@ -85,14 +85,14 @@ public struct AddonErrorPresenter {
         if let trimmedAddonName, !trimmedAddonName.isEmpty {
             resolvedAddonName = trimmedAddonName
         } else {
-            resolvedAddonName = "This extension"
+            resolvedAddonName = L10n.string("addons.this_extension")
         }
         let normalizedCode = normalizeCode(code)
         
         if cancelledByUser || normalizedCode == "ERROR_USER_CANCELED" || normalizedCode == "ERROR_ABORTED" {
             return AddonErrorPresentation(
                 statusText: nil,
-                alertMessage: isInstallation ? defaultInstallMessage(for: trimmedAddonName) : "Failed to update extension.",
+                alertMessage: isInstallation ? defaultInstallMessage(for: trimmedAddonName) : L10n.string("addons.error.update_extension"),
                 isUserCancelled: true
             )
         }
@@ -100,50 +100,50 @@ public struct AddonErrorPresenter {
         switch normalizedCode {
         case "ERROR_BLOCKLISTED":
             return AddonErrorPresentation(
-                statusText: "Blocked",
-                alertMessage: "\(resolvedAddonName) violates Mozilla's policies and can't be installed on Reynard.",
+                statusText: L10n.string("addons.error.status.blocked"),
+                alertMessage: L10n.string("addons.error.blocklisted", resolvedAddonName),
                 isUserCancelled: false
             )
         case "ERROR_SOFT_BLOCKED":
             return AddonErrorPresentation(
-                statusText: "Restricted",
-                alertMessage: "\(resolvedAddonName) is restricted and can't be installed on Reynard.",
+                statusText: L10n.string("addons.error.status.restricted"),
+                alertMessage: L10n.string("addons.error.soft_blocked", resolvedAddonName),
                 isUserCancelled: false
             )
         case "ERROR_NETWORK_FAILURE":
             return AddonErrorPresentation(
-                statusText: "Network error",
-                alertMessage: "This extension could not be downloaded because of a connection failure.",
+                statusText: L10n.string("addons.error.status.network"),
+                alertMessage: L10n.string("addons.error.network"),
                 isUserCancelled: false
             )
         case "ERROR_CORRUPT_FILE":
             return AddonErrorPresentation(
-                statusText: "Corrupt file",
-                alertMessage: "This extension could not be installed because it appears to be corrupt.",
+                statusText: L10n.string("addons.error.status.corrupt"),
+                alertMessage: L10n.string("addons.error.corrupt"),
                 isUserCancelled: false
             )
         case "ERROR_SIGNEDSTATE_REQUIRED":
             return AddonErrorPresentation(
-                statusText: "Not verified",
-                alertMessage: "This extension could not be installed because it has not been verified.",
+                statusText: L10n.string("addons.error.status.not_verified"),
+                alertMessage: L10n.string("addons.error.not_verified"),
                 isUserCancelled: false
             )
         case "ERROR_INCOMPATIBLE":
             return AddonErrorPresentation(
-                statusText: "Incompatible",
-                alertMessage: "\(resolvedAddonName) could not be installed because it is not compatible with this version of Reynard.",
+                statusText: L10n.string("addons.error.status.incompatible"),
+                alertMessage: L10n.string("addons.error.incompatible", resolvedAddonName),
                 isUserCancelled: false
             )
         case "ERROR_ADMIN_INSTALL_ONLY":
             return AddonErrorPresentation(
-                statusText: "Admin-only",
-                alertMessage: "\(resolvedAddonName) could not be installed because it can only be installed by an organization using enterprise policies, which isn't supported on this platform.",
+                statusText: L10n.string("addons.error.status.admin_only"),
+                alertMessage: L10n.string("addons.error.admin_only", resolvedAddonName),
                 isUserCancelled: false
             )
         default:
             return AddonErrorPresentation(
-                statusText: isInstallation ? "Error" : "Update failed",
-                alertMessage: isInstallation ? defaultInstallMessage(for: trimmedAddonName) : "Failed to update extension.",
+                statusText: isInstallation ? L10n.string("addons.error.status.error") : L10n.string("addons.error.status.update_failed"),
+                alertMessage: isInstallation ? defaultInstallMessage(for: trimmedAddonName) : L10n.string("addons.error.update_extension"),
                 isUserCancelled: false
             )
         }
@@ -151,9 +151,9 @@ public struct AddonErrorPresenter {
     
     private static func defaultInstallMessage(for addonName: String?) -> String {
         if let addonName, !addonName.isEmpty {
-            return "Failed to install \(addonName)."
+            return L10n.string("addons.error.install_named", addonName)
         }
-        return "Failed to install this extension."
+        return L10n.string("addons.error.install_extension")
     }
     
     private static func normalizeCode(_ code: String?) -> String? {

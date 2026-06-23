@@ -59,7 +59,7 @@ final class AddonPermissionPromptViewController: UITableViewController {
         button.layer.cornerRadius = UX.actionButtonCornerRadius
         button.layer.cornerCurve = .continuous
         button.titleLabel?.font = .preferredFont(forTextStyle: .headline)
-        button.setTitle(prompt.kind == .install ? "Add" : "Allow", for: .normal)
+        button.setTitle(prompt.kind == .install ? L10n.string("addons.prompt.add") : L10n.string("addons.prompt.allow"), for: .normal)
         button.addTarget(self, action: #selector(confirmPrompt), for: .touchUpInside)
         return button
     }()
@@ -144,11 +144,11 @@ final class AddonPermissionPromptViewController: UITableViewController {
             guard !permissionRows.isEmpty else {
                 return nil
             }
-            return "Required Permissions"
+            return L10n.string("addons.permissions.required")
         case .dataCollection:
-            return "Required Data Collection"
+            return L10n.string("addons.data.required")
         case .options:
-            return "Additional Options"
+            return L10n.string("addons.prompt.additional_options")
         case .message:
             return nil
         }
@@ -182,7 +182,7 @@ final class AddonPermissionPromptViewController: UITableViewController {
                 cell.textLabel?.text = value
             case .showAllSites:
                 cell.textLabel?.font = .preferredFont(forTextStyle: .body)
-                cell.textLabel?.text = "Show All Sites"
+                cell.textLabel?.text = L10n.string("addons.prompt.show_all_sites")
                 cell.textLabel?.textColor = view.tintColor
                 cell.selectionStyle = .default
                 cell.accessoryType = .disclosureIndicator
@@ -195,7 +195,7 @@ final class AddonPermissionPromptViewController: UITableViewController {
             cell.textLabel?.text = dataCollectionDescription
         case .options:
             cell.textLabel?.font = .preferredFont(forTextStyle: .body)
-            cell.textLabel?.text = "Allow in Private Browsing"
+            cell.textLabel?.text = L10n.string("addons.private_browsing.allow")
             cell.accessoryView = privateBrowsingSwitch
         }
         
@@ -289,14 +289,14 @@ final class AddonPermissionPromptViewController: UITableViewController {
         
         switch prompt.kind {
         case .install:
-            return "Add \(addonName)?"
+            return L10n.string("addons.prompt.add_named", addonName)
         case .optional:
             if prompt.permissions.isEmpty && prompt.origins.isEmpty && !prompt.dataCollectionPermissions.isEmpty {
-                return "\(addonName) requests additional data collection."
+                return L10n.string("addons.prompt.requests_data_collection", addonName)
             }
-            return "\(addonName) requests additional permissions."
+            return L10n.string("addons.prompt.requests_permissions", addonName)
         case .update:
-            return "\(addonName) has been updated. You must approve additional permissions before the updated version will install. Dismissing this prompt will maintain your current add-on version."
+            return L10n.string("addons.prompt.update_permissions_message", addonName)
         }
     }
     
@@ -304,7 +304,7 @@ final class AddonPermissionPromptViewController: UITableViewController {
         var rows: [PermissionRow] = []
         
         if !domains.isEmpty {
-            rows.append(.domainHeader("Access your data for sites in \(domains.count) domains"))
+            rows.append(.domainHeader(L10n.string("addons.permissions.sites_in_domains", domains.count)))
             rows.append(.showAllSites)
         }
         
@@ -350,9 +350,9 @@ final class AddonPermissionPromptViewController: UITableViewController {
     private static func promptTitle(for prompt: AddonPermissionPrompt) -> String {
         switch prompt.kind {
         case .install:
-            return "Add Add-on"
+            return L10n.string("addons.prompt.add_addon")
         case .optional, .update:
-            return "Update Add-on Permissions"
+            return L10n.string("addons.prompt.update_permissions_title")
         }
     }
     
@@ -365,7 +365,7 @@ private final class AddonPromptSiteListViewController: UITableViewController {
     init(sites: [String]) {
         self.sites = sites
         super.init(style: .insetGrouped)
-        title = "Sites"
+        title = L10n.string("addons.prompt.sites")
     }
     
     required init?(coder: NSCoder) {

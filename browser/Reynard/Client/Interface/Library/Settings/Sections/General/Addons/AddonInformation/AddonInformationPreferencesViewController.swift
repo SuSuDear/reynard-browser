@@ -19,9 +19,9 @@ final class AddonInformationPreferencesViewController: SettingsTableViewControll
             case .description:
                 return SettingsSectionText()
             case .information:
-                return SettingsSectionText(headerTitle: "Information")
+                return SettingsSectionText(headerTitle: L10n.string("addons.info.information"))
             case .links:
-                return SettingsSectionText(headerTitle: "Links")
+                return SettingsSectionText(headerTitle: L10n.string("addons.info.links"))
             }
         }
     }
@@ -88,17 +88,17 @@ final class AddonInformationPreferencesViewController: SettingsTableViewControll
         
         if let creatorName = metaData.creatorName?.trimmingCharacters(in: .whitespacesAndNewlines),
            !creatorName.isEmpty {
-            rows.append(InformationRow(title: "Author", value: creatorName, link: normalizedURLString(metaData.creatorURL)))
+            rows.append(InformationRow(title: L10n.string("addons.info.author"), value: creatorName, link: normalizedURLString(metaData.creatorURL)))
         }
         
-        rows.append(InformationRow(title: "Version", value: metaData.version, link: nil))
+        rows.append(InformationRow(title: L10n.string("updates.version_plain"), value: metaData.version, link: nil))
         
         if let updateDate = updateDateText(metaData.updateDate) {
-            rows.append(InformationRow(title: "Last updated", value: updateDate, link: nil))
+            rows.append(InformationRow(title: L10n.string("addons.info.last_updated"), value: updateDate, link: nil))
         }
         
         if let ratingText = ratingText(metaData) {
-            rows.append(InformationRow(title: "Rating", value: ratingText, link: normalizedURLString(metaData.reviewURL)))
+            rows.append(InformationRow(title: L10n.string("addons.info.rating"), value: ratingText, link: normalizedURLString(metaData.reviewURL)))
         }
         
         return rows
@@ -112,11 +112,11 @@ final class AddonInformationPreferencesViewController: SettingsTableViewControll
         var rows: [InformationRow] = []
         
         if let homepageURL = normalizedURLString(metaData.homepageURL) {
-            rows.append(InformationRow(title: "Homepage", value: homepageURL, link: homepageURL))
+            rows.append(InformationRow(title: L10n.string("addons.info.homepage"), value: homepageURL, link: homepageURL))
         }
         
         if let listingURL = normalizedURLString(metaData.amoListingURL) {
-            rows.append(InformationRow(title: "More about this extension", value: listingURL, link: listingURL))
+            rows.append(InformationRow(title: L10n.string("addons.info.more_about"), value: listingURL, link: listingURL))
         }
         
         return rows
@@ -127,7 +127,7 @@ final class AddonInformationPreferencesViewController: SettingsTableViewControll
     init(addonID: String) {
         self.addonID = addonID
         super.init(style: .insetGrouped)
-        title = "Details"
+        title = L10n.string("addons.details")
     }
     
     required init?(coder: NSCoder) {
@@ -259,7 +259,7 @@ final class AddonInformationPreferencesViewController: SettingsTableViewControll
             }
         } catch {
             await MainActor.run {
-                AlertPresenter.show(title: "Failed to reload add-on", message: "\(error)")
+                AlertPresenter.show(title: L10n.string("addons.error.reload"), message: "\(error)")
             }
         }
     }
