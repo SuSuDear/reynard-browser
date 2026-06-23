@@ -15,7 +15,7 @@ final class SearchEnginePreferencesViewController: SettingsTableViewController, 
         var text: SettingsSectionText {
             switch self {
             case .engines:
-                return SettingsSectionText(headerTitle: "Search Engine")
+                return SettingsSectionText(headerTitle: L10n.string("settings.search.engine"))
             case .customTemplate:
                 return SettingsSectionText()
             }
@@ -32,7 +32,7 @@ final class SearchEnginePreferencesViewController: SettingsTableViewController, 
     
     init() {
         super.init(style: .insetGrouped)
-        title = "Search Engine"
+        title = L10n.string("settings.search.engine")
     }
     
     required init?(coder: NSCoder) {
@@ -130,12 +130,12 @@ final class SearchEnginePreferencesViewController: SettingsTableViewController, 
         guard displayedSection == .customTemplate else {
             return displayedSection.text
         }
-        let baseText = "Enter URL with %s in place of query"
+        let baseText = L10n.string("settings.search.custom_template_footer")
         guard !Prefs.SearchSettings.customSearchTemplate.isEmpty,
               SearchEngine.canSearch(using: Prefs.SearchSettings.customSearchTemplate) else {
             return SettingsSectionText(footerTitle: baseText)
         }
-        return SettingsSectionText(footerTitle: "\(baseText). The current value must be a valid http(s) URL.")
+        return SettingsSectionText(footerTitle: L10n.string("settings.search.custom_template_valid_footer", baseText))
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
@@ -144,8 +144,8 @@ final class SearchEnginePreferencesViewController: SettingsTableViewController, 
         let customQueryTemplate = Prefs.SearchSettings.customSearchTemplate
         guard !customQueryTemplate.isEmpty, !SearchEngine.canSearch(using: customQueryTemplate) else { return }
         AlertPresenter.show(
-            title: "Invalid Search URL",
-            message: "Enter a valid http(s) URL containing %s where the search query should go."
+            title: L10n.string("settings.search.invalid_url_title"),
+            message: L10n.string("settings.search.invalid_url_message")
         )
     }
     

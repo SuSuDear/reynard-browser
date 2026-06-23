@@ -23,7 +23,7 @@ struct PrivacySettingsSection {
         
         switch Row.allCases[index] {
         case .sitePermissions:
-            return SettingsViewUtils.disclosureCell(title: "Site Permissions")
+            return SettingsViewUtils.disclosureCell(title: L10n.string("permissions.site_permissions"))
         }
     }
     

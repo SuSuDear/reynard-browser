@@ -47,12 +47,12 @@ final class JITSettingsSection: NSObject {
         switch Row.allCases[index] {
         case .enableJIT:
             let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
-            cell.textLabel?.text = "Enable JIT"
+            cell.textLabel?.text = L10n.string("jit.enable")
             cell.selectionStyle = .none
             cell.accessoryView = jitSwitch
             return cell
         case .importPairingFile:
-            let cell = SettingsViewUtils.actionCell(title: "Import Pairing File...", tintColor: tintColor)
+            let cell = SettingsViewUtils.actionCell(title: L10n.string("jit.import_pairing_file"), tintColor: tintColor)
             
             if #available(iOS 16.6, *) {
                 if #unavailable(iOS 17.4) {
@@ -152,7 +152,7 @@ final class JITSettingsSection: NSObject {
                 }
             } catch {
                 DispatchQueue.main.async {
-                    AlertPresenter.show(title: "Import Failed", message: error.localizedDescription)
+                    AlertPresenter.show(title: L10n.string("jit.import_failed"), message: error.localizedDescription)
                 }
             }
         }
@@ -165,8 +165,8 @@ final class JITSettingsSection: NSObject {
         
         sender.isEnabled = false
         let alert = UIAlertController(
-            title: "Preparing JIT",
-            message: "Since this is your first time enabling JIT, Reynard needs to download and mount the Developer Disk Image. This is required for JIT to work properly.",
+            title: L10n.string("jit.preparing"),
+            message: L10n.string("jit.preparing_message"),
             preferredStyle: .alert
         )
         let progressView = UIProgressView(progressViewStyle: .default)
@@ -175,7 +175,7 @@ final class JITSettingsSection: NSObject {
         
         let token = UUID()
         activeDDIDownloadToken = token
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { [weak self] _ in
+        alert.addAction(UIAlertAction(title: L10n.string("common.cancel"), style: .cancel) { [weak self] _ in
             self?.cancelDDI(for: sender, token: token)
         })
         
@@ -219,7 +219,7 @@ final class JITSettingsSection: NSObject {
                     Prefs.JITSettings.isJITEnabled = false
                     sender.setOn(false, animated: true)
                     SettingsViewUtils.dismissPresentedAlert(alert, from: settingsController) {
-                        AlertPresenter.show(title: "Download Failed", message: error.localizedDescription)
+                        AlertPresenter.show(title: L10n.string("jit.download_failed"), message: error.localizedDescription)
                     }
                 }
             }
@@ -240,11 +240,11 @@ final class JITSettingsSection: NSObject {
     
     private func showRestartAlert() {
         let alert = UIAlertController(
-            title: "Restart Required",
-            message: "The app will now close for the JIT setting to take effect.",
+            title: L10n.string("jit.restart_required"),
+            message: L10n.string("jit.restart_message"),
             preferredStyle: .alert
         )
-        alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+        alert.addAction(UIAlertAction(title: L10n.string("common.ok"), style: .default) { _ in
             UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
             DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
                 exit(EXIT_SUCCESS)
@@ -266,7 +266,7 @@ final class JITSettingsSection: NSObject {
         statusLabel.font = statusBoldFont
         statusLabel.adjustsFontForContentSizeCategory = true
         statusLabel.textColor = .systemOrange
-        statusLabel.text = "\u{25B2} JIT-Less Mode is Currently Active"
+        statusLabel.text = L10n.string("jit.jitless_active")
         return statusLabel
     }
     
@@ -276,7 +276,7 @@ final class JITSettingsSection: NSObject {
         detailLabel.font = UIFont.preferredFont(forTextStyle: .footnote)
         detailLabel.adjustsFontForContentSizeCategory = true
         detailLabel.textColor = .secondaryLabel
-        detailLabel.text = "Enabling JIT improves performance significantly and is required for features like WebAssembly."
+        detailLabel.text = L10n.string("jit.performance_detail")
         return detailLabel
     }
     
@@ -286,7 +286,7 @@ final class JITSettingsSection: NSObject {
         warningLabel.font = UIFont.preferredFont(forTextStyle: .footnote)
         warningLabel.adjustsFontForContentSizeCategory = true
         warningLabel.textColor = .systemRed
-        warningLabel.text = "This pairing-based JIT enablement method is not working properly on the OS version you are using. You can use the browser without JIT; or if you're on an iOS/iPadOS version that supports TrollStore, consider using the TrollStore IPA instead."
+        warningLabel.text = L10n.string("jit.unsupported_version_warning")
         return warningLabel
     }
 }

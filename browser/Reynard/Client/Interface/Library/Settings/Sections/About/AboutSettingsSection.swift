@@ -29,15 +29,15 @@ struct AboutSettingsSection {
         switch Row.allCases[index] {
         case .appVersion:
             let info = Bundle.main.infoDictionary
-            let version = info?["CFBundleShortVersionString"] as? String ?? "Unknown"
-            let build = info?["CFBundleVersion"] as? String ?? "Unknown"
-            return valueCell(title: "Reynard Browser", value: "\(version) (\(build))")
+            let version = info?["CFBundleShortVersionString"] as? String ?? L10n.string("common.unknown")
+            let build = info?["CFBundleVersion"] as? String ?? L10n.string("common.unknown")
+            return valueCell(title: L10n.string("app.name"), value: "\(version) (\(build))")
         case .engineVersion:
-            return valueCell(title: "Engine Version", value: GeckoRuntime.version)
+            return valueCell(title: L10n.string("about.engine_version"), value: GeckoRuntime.version)
         case .sourceCode:
-            return linkCell(title: "View Source Code")
+            return linkCell(title: L10n.string("about.view_source_code"))
         case .supportProject:
-            return linkCell(title: "Support The Project")
+            return linkCell(title: L10n.string("about.support_project"))
         case .githubProfile:
             return linkCell(title: "GitHub - @minh-ton")
         }

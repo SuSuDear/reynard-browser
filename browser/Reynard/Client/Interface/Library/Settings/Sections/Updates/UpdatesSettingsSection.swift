@@ -55,7 +55,7 @@ final class UpdatesSettingsSection {
         case .releaseNotes:
             return UpdateReleaseNotesCell()
         case .updateNow:
-            let cell = SettingsViewUtils.actionCell(title: "Update Now", tintColor: tintColor)
+            let cell = SettingsViewUtils.actionCell(title: L10n.string("updates.update_now"), tintColor: tintColor)
             cell.textLabel?.textAlignment = .center
             return cell
         }
@@ -71,7 +71,7 @@ final class UpdatesSettingsSection {
         footerLabel.font = UIFont.preferredFont(forTextStyle: .footnote)
         footerLabel.adjustsFontForContentSizeCategory = true
         footerLabel.textColor = .secondaryLabel
-        footerLabel.text = "Make sure TrollStore's URL Scheme is enabled."
+        footerLabel.text = L10n.string("updates.trollstore_url_scheme_footer")
         
         footerView.contentView.addSubview(footerLabel)
         NSLayoutConstraint.activate([
@@ -100,7 +100,7 @@ final class UpdatesSettingsSection {
               let latestEntry = versions.first,
               let packageURLString = latestEntry["downloadURL"] as? String,
               let packageURL = URL(string: packageURLString) else {
-            AlertPresenter.show(title: "Update Unavailable", message: "Could not retrieve the download URL.")
+            AlertPresenter.show(title: L10n.string("updates.unavailable_title"), message: L10n.string("updates.unavailable_message"))
             return
         }
         
@@ -123,7 +123,7 @@ final class UpdatesSettingsSection {
                 from: packageURL,
                 fileName: "Reynard.ipa",
                 expectedSize: expectedSize,
-                message: "When the download finishes, choose the app that you used to sideload Reynard in the share sheet to install the update.",
+                message: L10n.string("updates.sideload_install_message"),
                 viewController: viewController
             )
         }
@@ -146,7 +146,7 @@ final class UpdatesSettingsSection {
             return
         }
         
-        let alert = UIAlertController(title: "Downloading Update", message: message, preferredStyle: .alert)
+        let alert = UIAlertController(title: L10n.string("updates.downloading_title"), message: message, preferredStyle: .alert)
         let progressView = UIProgressView(progressViewStyle: .default)
         progressView.translatesAutoresizingMaskIntoConstraints = false
         progressView.progress = 0
@@ -170,7 +170,7 @@ final class UpdatesSettingsSection {
                     }
                     
                     SettingsViewUtils.dismissPresentedAlert(alert, from: viewController) {
-                        AlertPresenter.show(title: "Download Failed", message: error.localizedDescription)
+                        AlertPresenter.show(title: L10n.string("updates.download_failed"), message: error.localizedDescription)
                     }
                     return
                 }
@@ -188,7 +188,7 @@ final class UpdatesSettingsSection {
         }
         activeUpdateTask = task
         
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { [weak self] _ in
+        alert.addAction(UIAlertAction(title: L10n.string("common.cancel"), style: .cancel) { [weak self] _ in
             self?.activeUpdateTask?.cancel()
             self?.activeUpdateTask = nil
             self?.updateProgressObservation = nil

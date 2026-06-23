@@ -30,21 +30,21 @@ final class SiteSettingsViewController: UITableViewController {
         var title: String {
             switch self {
             case .camera:
-                return "Camera"
+                return L10n.string("permissions.camera")
             case .microphone:
-                return "Microphone"
+                return L10n.string("permissions.microphone")
             case .location:
-                return "Location"
+                return L10n.string("permissions.location")
             case .persistentStorage:
-                return "Persistent Storage"
+                return L10n.string("permissions.persistent_storage")
             case .crossOriginStorageAccess:
-                return "Cross-site Cookies"
+                return L10n.string("permissions.cross_site_cookies")
             case .localDeviceAccess:
-                return "Device Apps and Services"
+                return L10n.string("permissions.device_apps_services")
             case .localNetworkAccess:
-                return "Local Network Devices"
+                return L10n.string("permissions.local_network_devices")
             case .autoplay:
-                return "Autoplay"
+                return L10n.string("permissions.autoplay")
             }
         }
         
@@ -114,7 +114,7 @@ final class SiteSettingsViewController: UITableViewController {
         self.origin = origin
         self.session = session
         super.init(style: .insetGrouped)
-        title = "Settings for \(host)"
+        title = L10n.string("site_settings.title", host)
     }
     
     required init?(coder: NSCoder) {
@@ -157,9 +157,9 @@ final class SiteSettingsViewController: UITableViewController {
         case .availability:
             return nil
         case .permissions:
-            return "Permissions"
+            return L10n.string("permissions.title")
         case .siteActions:
-            return "Actions"
+            return L10n.string("permissions.actions")
         }
     }
     
@@ -211,7 +211,7 @@ final class SiteSettingsViewController: UITableViewController {
         }
         
         let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
-        cell.textLabel?.text = "Open Settings"
+        cell.textLabel?.text = L10n.string("permissions.open_settings")
         cell.textLabel?.textColor = view.tintColor
         cell.accessoryType = .none
         return cell
@@ -257,9 +257,9 @@ final class SiteSettingsViewController: UITableViewController {
     
     private func resetSitePermissionsCell() -> UITableViewCell {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
-        cell.textLabel?.text = "Reset Permissions for this Site"
+        cell.textLabel?.text = L10n.string("permissions.reset_this_site")
         cell.textLabel?.textColor = .systemRed
-        cell.detailTextLabel?.text = didResetSitePermissions ? "Successfully reset permissions for this site." : nil
+        cell.detailTextLabel?.text = didResetSitePermissions ? L10n.string("permissions.reset_this_site_success") : nil
         cell.detailTextLabel?.textColor = .secondaryLabel
         cell.accessoryView = nil
         cell.accessoryType = .none

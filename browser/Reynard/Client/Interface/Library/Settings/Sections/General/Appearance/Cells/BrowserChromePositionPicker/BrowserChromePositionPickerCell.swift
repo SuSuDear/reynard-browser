@@ -14,12 +14,12 @@ final class BrowserChromePositionPickerCell: UITableViewCell {
     private let bottomPositionOption = BrowserChromePositionOptionControl(
         position: .bottom,
         symbolName: "reynard.platter.filled.bottom.iphone",
-        title: "Bottom"
+        title: L10n.string("settings.appearance.position.bottom")
     )
     private let topPositionOption = BrowserChromePositionOptionControl(
         position: .top,
         symbolName: "reynard.platter.filled.top.iphone",
-        title: "Top"
+        title: L10n.string("settings.appearance.position.top")
     )
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

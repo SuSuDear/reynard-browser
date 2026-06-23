@@ -43,13 +43,13 @@ enum SiteSettingsUtils {
         var permissions: [String] = []
         
         if isCameraPermissionDisabled() {
-            permissions.append("Camera")
+            permissions.append(L10n.string("permissions.camera"))
         }
         if isMicrophonePermissionDisabled() {
-            permissions.append("Microphone")
+            permissions.append(L10n.string("permissions.microphone"))
         }
         if isLocationPermissionDisabled() {
-            permissions.append("Location")
+            permissions.append(L10n.string("permissions.location"))
         }
         
         return permissions
@@ -60,10 +60,10 @@ enum SiteSettingsUtils {
         let permissionList = formattedPermissionList(names)
         
         if names.count == 1 {
-            return "\(permissionList) is currently disabled for Reynard. Open the Settings app to enable this permission."
+            return L10n.string("permissions.disabled_message.one", permissionList)
         }
         
-        return "\(permissionList) are currently disabled for Reynard. Open the Settings app to enable these permissions."
+        return L10n.string("permissions.disabled_message.other", permissionList)
     }
     
     // MARK: - Permission Actions
@@ -79,20 +79,20 @@ enum SiteSettingsUtils {
         case .autoplay:
             switch action {
             case .allowed:
-                return "Allow Audio and Video"
+                return L10n.string("permissions.allow_audio_video")
             case .askToAllow:
-                return "Block Audio only"
+                return L10n.string("permissions.block_audio_only")
             case .blocked:
-                return "Block Audio and Video"
+                return L10n.string("permissions.block_audio_video")
             }
         default:
             switch action {
             case .allowed:
-                return "Allow"
+                return L10n.string("permissions.allow")
             case .askToAllow:
-                return "Ask"
+                return L10n.string("permissions.ask")
             case .blocked:
-                return "Deny"
+                return L10n.string("permissions.deny")
             }
         }
     }
@@ -231,11 +231,11 @@ enum SiteSettingsUtils {
         }
         
         if names.count == 2 {
-            return "\(names[0]) and \(names[1])"
+            return L10n.string("list.two_items", names[0], names[1])
         }
         
         let head = names.dropLast().joined(separator: ", ")
         let tail = names[names.count - 1]
-        return "\(head), and \(tail)"
+        return L10n.string("list.multiple_items", head, tail)
     }
 }
