@@ -257,6 +257,14 @@ jobs:
           echo "Prebuilt Gecko dist/bin contents:"
           ls -la "$OBJDIR/dist/bin" | head -40
 
+          echo "Prebuilt Gecko Swift bridge headers:"
+          find "$OBJDIR/dist/include" \
+            \( -name 'GeckoViewSwiftSupport.h' -o -name 'IOSBootstrap.h' -o -name 'GeckoViewRuntimeSupport.h' \) \
+            -print | sort
+
+          echo "Top-level prebuilt Gecko dist/bin symlinks:"
+          find "$OBJDIR/dist/bin" -maxdepth 1 -type l -ls | head -40 || true
+
       - name: Run xcodebuild (unsigned)
         if: ${{ github.event_name == 'push' || inputs.run_xcodebuild }}
         working-directory: browser
