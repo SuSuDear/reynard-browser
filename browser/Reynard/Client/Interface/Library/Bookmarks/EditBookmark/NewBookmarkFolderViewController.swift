@@ -37,7 +37,7 @@ final class NewBookmarkFolderViewController: UIViewController, UITableViewDataSo
         textField.clearButtonMode = .whileEditing
         textField.font = .preferredFont(forTextStyle: .body)
         textField.adjustsFontForContentSizeCategory = true
-        textField.placeholder = "Title"
+        textField.placeholder = L10n.string("bookmarks.edit.title_placeholder")
         textField.delegate = self
         textField.addTarget(self, action: #selector(validateSaveButton), for: .editingChanged)
         return textField
@@ -59,7 +59,7 @@ final class NewBookmarkFolderViewController: UIViewController, UITableViewDataSo
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "New Folder"
+        title = L10n.string("bookmarks.new_folder")
         view.backgroundColor = .systemGroupedBackground
         navigationItem.largeTitleDisplayMode = .never
         
@@ -69,7 +69,7 @@ final class NewBookmarkFolderViewController: UIViewController, UITableViewDataSo
             navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(createFolder))
             navigationItem.rightBarButtonItem?.tintColor = .label
         } else {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Save", style: .done, target: self, action: #selector(createFolder))
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: L10n.string("common.save"), style: .done, target: self, action: #selector(createFolder))
         }
         
         view.addSubview(tableView)
@@ -100,7 +100,7 @@ final class NewBookmarkFolderViewController: UIViewController, UITableViewDataSo
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        section == 1 ? "Location" : nil
+        section == 1 ? L10n.string("bookmarks.edit.location") : nil
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

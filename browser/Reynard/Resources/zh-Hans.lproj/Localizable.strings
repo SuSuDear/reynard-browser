@@ -337,3 +337,16 @@
 "web_prompt.folder_upload_all" = "确定要上传所有文件吗？只有在你信任该网站时才这样做。";
 "web_prompt.folder_upload_named" = "确定要上传 "%@" 中的所有文件吗？只有在你信任该网站时才这样做。";
 "web_prompt.upload" = "上传";
+"clear_data.clear_timeframe" = "清除时间范围";
+"clear_data.downloads_footer" = "清除下载历史不会删除“下载”文件夹中的文件。";
+"downloads.clear_downloads" = "清除下载记录";
+"downloads.title" = "下载";
+"history.title" = "历史记录";
+"search.suggestions" = "%@ 建议";
+"search.user_data_header" = "书签、历史记录和标签页";
+"tab_overview.private" = "隐私";
+"tab_overview.private_browsing" = "隐私浏览";
+"tab_overview.private_browsing_footer" = "Reynard 不会记住你的浏览历史或 Cookie。不过，下载内容和新书签仍会保存。";
+"tab_overview.tab_count.one" = "%d 个标签页";
+"tab_overview.tab_count.other" = "%d 个标签页";
+"tab_overview.zero_tabs" = "0 个标签页";

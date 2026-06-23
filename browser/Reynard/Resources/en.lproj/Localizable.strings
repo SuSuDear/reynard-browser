@@ -337,3 +337,16 @@
 "web_prompt.folder_upload_all" = "Are you sure you want to upload all files? Only do this if you trust the site.";
 "web_prompt.folder_upload_named" = "Are you sure you want to upload all files from "%@"? Only do this if you trust the site.";
 "web_prompt.upload" = "Upload";
+"clear_data.clear_timeframe" = "Clear Timeframe";
+"clear_data.downloads_footer" = "Clearing downloads history does not delete files in your Downloads folder.";
+"downloads.clear_downloads" = "Clear Downloads";
+"downloads.title" = "Downloads";
+"history.title" = "History";
+"search.suggestions" = "%@ Suggestions";
+"search.user_data_header" = "Bookmarks, History, and Tabs";
+"tab_overview.private" = "Private";
+"tab_overview.private_browsing" = "Private Browsing";
+"tab_overview.private_browsing_footer" = "Reynard won't remember any of your browsing history or cookies. However, downloads and new bookmarks will be saved.";
+"tab_overview.tab_count.one" = "%d Tab";
+"tab_overview.tab_count.other" = "%d Tabs";
+"tab_overview.zero_tabs" = "0 Tabs";
