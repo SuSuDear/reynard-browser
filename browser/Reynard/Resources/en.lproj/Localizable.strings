@@ -369,3 +369,11 @@
 "context_menu.copy_link" = "Copy Link";
 "context_menu.share_link" = "Share Link";
 "common.homepage" = "Homepage";
+"settings.search.custom" = "Custom";
+"bookmarks.favorites" = "Favorites";
+"file_name.download" = "Download";
+"file_name.folder" = "Folder";
+"file_name.video" = "Video";
+"file_name.photo" = "Photo";
+"file_name.file" = "File";
+"file_name.photo_jpg" = "photo.jpg";

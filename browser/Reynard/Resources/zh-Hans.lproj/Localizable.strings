@@ -369,3 +369,11 @@
 "context_menu.copy_link" = "复制链接";
 "context_menu.share_link" = "分享链接";
 "common.homepage" = "主页";
+"settings.search.custom" = "自定义";
+"bookmarks.favorites" = "收藏";
+"file_name.download" = "下载";
+"file_name.folder" = "文件夹";
+"file_name.video" = "视频";
+"file_name.photo" = "照片";
+"file_name.file" = "文件";
+"file_name.photo_jpg" = "照片.jpg";

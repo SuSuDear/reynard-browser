@@ -15,11 +15,11 @@ final class BookmarkFolderRowCell: UITableViewCell {
         static let titleVerticalInset: CGFloat = 10
         static let separatorTitleOffset: CGFloat = 40
     }
-    
+
     private var hierarchyDepth = 0
-    
+
     private var folderIconLeadingConstraint: NSLayoutConstraint?
-    
+
     private let folderIconView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -27,7 +27,7 @@ final class BookmarkFolderRowCell: UITableViewCell {
         imageView.tintColor = .systemBlue
         return imageView
     }()
-    
+
     private let folderTitleLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -36,24 +36,24 @@ final class BookmarkFolderRowCell: UITableViewCell {
         label.adjustsFontForContentSizeCategory = true
         return label
     }()
-    
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         backgroundColor = .secondarySystemGroupedBackground
         tintColor = .systemBlue
-        
+
         contentView.addSubview(folderIconView)
         contentView.addSubview(folderTitleLabel)
-        
+
         let folderIconLeadingConstraint = folderIconView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor)
         self.folderIconLeadingConstraint = folderIconLeadingConstraint
-        
+
         NSLayoutConstraint.activate([
             folderIconLeadingConstraint,
             folderIconView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             folderIconView.widthAnchor.constraint(equalToConstant: UX.iconSize),
             folderIconView.heightAnchor.constraint(equalToConstant: UX.iconSize),
-            
+
             folderTitleLabel.leadingAnchor.constraint(equalTo: folderIconView.trailingAnchor, constant: UX.titleLeadingSpacing),
             folderTitleLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
             folderTitleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
@@ -61,11 +61,11 @@ final class BookmarkFolderRowCell: UITableViewCell {
             folderTitleLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -UX.titleVerticalInset),
         ])
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func layoutSubviews() {
         super.layoutSubviews()
         let titleLeading = contentView.layoutMargins.left + CGFloat(hierarchyDepth) * UX.hierarchyIndentWidth + UX.separatorTitleOffset
@@ -76,19 +76,29 @@ final class BookmarkFolderRowCell: UITableViewCell {
             right: contentView.layoutMargins.right
         )
     }
-    
+
     func configure(folder: BookmarkFolderSnapshot, depth: Int, isSelected: Bool) {
         hierarchyDepth = depth
-        folderTitleLabel.text = folder.title
+        folderTitleLabel.text = localizedFolderTitle(folder)
         folderIconLeadingConstraint?.constant = CGFloat(depth) * UX.hierarchyIndentWidth
         folderIconView.tintColor = isSelected ? .systemBlue : .secondaryLabel
-        
+
         if folder.parentGUID == nil {
             folderIconView.image = UIImage(named: "reynard.book")?.withRenderingMode(.alwaysTemplate)
-        } else if folder.isProtected && folder.title == "Favorites" {
+        } else if folder.isProtected && folder.guid == "favorites___" {
             folderIconView.image = UIImage(named: "reynard.star")?.withRenderingMode(.alwaysTemplate)
         } else {
             folderIconView.image = UIImage(named: "reynard.folder")?.withRenderingMode(.alwaysTemplate)
         }
+    }
+
+    private func localizedFolderTitle(_ folder: BookmarkFolderSnapshot) -> String {
+        if folder.parentGUID == nil {
+            return L10n.string("bookmarks.title")
+        }
+        if folder.guid == "favorites___" {
+            return L10n.string("bookmarks.favorites")
+        }
+        return folder.title
     }
 }

@@ -525,7 +525,7 @@ final class DownloadStore: NSObject {
     // MARK: - Files
     
     private func resolvedFileName(suggestedFileName: String?, sourceURL: URL, mimeType: String?) -> String {
-        let fallbackName = sourceURL.lastPathComponent.isEmpty ? "Download" : sourceURL.lastPathComponent
+        let fallbackName = sourceURL.lastPathComponent.isEmpty ? L10n.string("file_name.download") : sourceURL.lastPathComponent
         let initialName = sanitizeFileName(suggestedFileName ?? fallbackName)
         
         guard URL(fileURLWithPath: initialName).pathExtension.isEmpty,
@@ -553,7 +553,7 @@ final class DownloadStore: NSObject {
             .filter { !$0.isEmpty }
             .joined(separator: "-")
         
-        return sanitized.isEmpty ? "Download" : sanitized
+        return sanitized.isEmpty ? L10n.string("file_name.download") : sanitized
     }
     
     private func makeUniqueDestinationURLLocked(for fileName: String) -> URL {
