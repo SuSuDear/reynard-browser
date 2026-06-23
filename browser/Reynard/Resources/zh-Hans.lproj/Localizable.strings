@@ -320,3 +320,20 @@
 "addons.data.long.technical_interaction" = "与扩展开发者共享技术和交互数据";
 "addons.data.long.website_activity" = "与扩展开发者共享网站活动";
 "addons.data.long.website_content" = "与扩展开发者共享网站内容";
+
+"common.yes" = "是";
+"common.no" = "否";
+"permissions.dont_allow" = "不允许";
+"file_picker.photo_library" = "照片图库";
+"file_picker.choose_folder" = "选择文件夹";
+"file_picker.choose_file" = "选择文件";
+"file_picker.take_photo_or_video" = "拍摄照片或视频";
+"file_picker.take_photo" = "拍照";
+"file_picker.take_video" = "录像";
+"select_picker.select_option" = "选择选项";
+"select_picker.option" = "选项";
+
+"web_prompt.confirm_upload" = "确认上传";
+"web_prompt.folder_upload_all" = "确定要上传所有文件吗？只有在你信任该网站时才这样做。";
+"web_prompt.folder_upload_named" = "确定要上传 "%@" 中的所有文件吗？只有在你信任该网站时才这样做。";
+"web_prompt.upload" = "上传";

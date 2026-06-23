@@ -320,3 +320,20 @@
 "addons.data.long.technical_interaction" = "Share technical and interaction data with extension developer";
 "addons.data.long.website_activity" = "Share website activity with extension developer";
 "addons.data.long.website_content" = "Share website content with extension developer";
+
+"common.yes" = "Yes";
+"common.no" = "No";
+"permissions.dont_allow" = "Don't Allow";
+"file_picker.photo_library" = "Photo Library";
+"file_picker.choose_folder" = "Choose Folder";
+"file_picker.choose_file" = "Choose File";
+"file_picker.take_photo_or_video" = "Take Photo or Video";
+"file_picker.take_photo" = "Take Photo";
+"file_picker.take_video" = "Take Video";
+"select_picker.select_option" = "Select Option";
+"select_picker.option" = "Option";
+
+"web_prompt.confirm_upload" = "Confirm Upload";
+"web_prompt.folder_upload_all" = "Are you sure you want to upload all files? Only do this if you trust the site.";
+"web_prompt.folder_upload_named" = "Are you sure you want to upload all files from "%@"? Only do this if you trust the site.";
+"web_prompt.upload" = "Upload";
