@@ -40,19 +40,13 @@ enum WebLanguage: String, CaseIterable {
 
     func applyGeckoPreference() {
         if let acceptLanguages {
-            GeckoEventDispatcherWrapper.runtimeInstance.dispatch(
-                type: "GeckoView:Preferences:SetPref",
-                message: [
-                    "name": "intl.accept_languages",
-                    "type": "string",
-                    "value": acceptLanguages,
-                ]
+            GeckoEventDispatcherWrapper.setPreference(
+                name: "intl.accept_languages",
+                type: "string",
+                value: acceptLanguages
             )
         } else {
-            GeckoEventDispatcherWrapper.runtimeInstance.dispatch(
-                type: "GeckoView:Preferences:ClearPref",
-                message: ["name": "intl.accept_languages"]
-            )
+            GeckoEventDispatcherWrapper.clearPreference(name: "intl.accept_languages")
         }
     }
 }

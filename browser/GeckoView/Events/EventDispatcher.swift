@@ -64,6 +64,24 @@ public class GeckoEventDispatcherWrapper: NSObject, SwiftEventDispatcher {
         dispatchers[byName] = dispatcher
         return dispatcher
     }
+
+    public static func setPreference(name: String, type: String, value: Any) {
+        runtimeInstance.dispatch(
+            type: "GeckoView:Preferences:SetPref",
+            message: [
+                "name": name,
+                "type": type,
+                "value": value,
+            ]
+        )
+    }
+
+    public static func clearPreference(name: String) {
+        runtimeInstance.dispatch(
+            type: "GeckoView:Preferences:ClearPref",
+            message: ["name": name]
+        )
+    }
     
     func addListener(type: String, listener: GeckoEventListenerInternal) {
         listeners[type, default: []] += [listener]
