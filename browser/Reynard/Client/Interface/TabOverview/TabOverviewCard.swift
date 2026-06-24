@@ -46,6 +46,7 @@ final class TabOverviewCard: UICollectionViewCell {
     }
 
     static let reuseIdentifier = "TabOverviewCard"
+    static let webpagePreviewRestingInset = UX.webpagePreviewRestingInset
 
     var onClose: (() -> Void)?
 

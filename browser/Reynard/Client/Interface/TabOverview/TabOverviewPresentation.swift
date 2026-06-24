@@ -76,8 +76,11 @@ final class TabOverviewPresentation {
         let columns = UX.minimumTabCardColumnCount
         let totalSpacing = CGFloat(columns - 1) * UX.cardCollectionItemSpacing
         let previewWidth = max(floor((availableWidth - totalSpacing) / CGFloat(columns)), 1)
-        let previewScale = previewWidth / max(contentSize.width, 1)
-        let previewHeight = max(floor(contentSize.height * previewScale), 1)
+        let previewInset = TabOverviewCard.webpagePreviewRestingInset
+        let imageWidth = max(previewWidth - (previewInset * 2), 1)
+        let previewScale = imageWidth / max(contentSize.width, 1)
+        let imageHeight = max(contentSize.height * previewScale, 1)
+        let previewHeight = imageHeight + (previewInset * 2)
         return CGSize(width: previewWidth, height: previewHeight + UX.cardMetadataHeight)
     }
 
