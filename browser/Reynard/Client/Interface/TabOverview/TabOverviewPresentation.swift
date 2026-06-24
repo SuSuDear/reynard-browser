@@ -10,9 +10,6 @@ import UIKit
 final class TabOverviewPresentation {
     private enum UX {
         static let cardCollectionItemSpacing: CGFloat = 16
-        static let cardMinimumPreviewAspectRatio: CGFloat = 0.4
-        static let phoneCardTargetWidth: CGFloat = 170
-        static let padCardTargetWidth: CGFloat = 250
         static let minimumTabCardColumnCount = 2
         static let cardMetadataHeight: CGFloat = 22
         static let hiddenCollectionVerticalOffset: CGFloat = 26
@@ -73,21 +70,15 @@ final class TabOverviewPresentation {
     // MARK: - Layout
 
     func cardSize(in collectionView: UICollectionView) -> CGSize {
-        context.containerView.layoutIfNeeded()
         let horizontalInsets = collectionView.adjustedContentInset.left + collectionView.adjustedContentInset.right
-        let availableWidth = collectionView.bounds.width - horizontalInsets
-        let tabViewAspectRatio = max(UX.cardMinimumPreviewAspectRatio, tabOverview.previewAspectRatio)
-
-        let targetWidth = context.browserLayout.chromeMode == .phone
-        ? UX.phoneCardTargetWidth
-        : UX.padCardTargetWidth
-        let computedColumns = Int((availableWidth + UX.cardCollectionItemSpacing) / (targetWidth + UX.cardCollectionItemSpacing))
-        let columns = max(UX.minimumTabCardColumnCount, computedColumns)
-
+        let availableWidth = max(collectionView.bounds.width - horizontalInsets, 1)
+        let contentSize = tabOverview.previewContentSize
+        let columns = UX.minimumTabCardColumnCount
         let totalSpacing = CGFloat(columns - 1) * UX.cardCollectionItemSpacing
-        let itemWidth = floor((availableWidth - totalSpacing) / CGFloat(columns))
-        let itemHeight = floor((itemWidth * tabViewAspectRatio) + UX.cardMetadataHeight)
-        return CGSize(width: itemWidth, height: itemHeight)
+        let previewWidth = max(floor((availableWidth - totalSpacing) / CGFloat(columns)), 1)
+        let previewScale = previewWidth / max(contentSize.width, 1)
+        let previewHeight = max(floor(contentSize.height * previewScale), 1)
+        return CGSize(width: previewWidth, height: previewHeight + UX.cardMetadataHeight)
     }
 
     func refreshForCurrentOrientation() {

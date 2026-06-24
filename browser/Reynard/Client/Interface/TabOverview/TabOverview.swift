@@ -84,15 +84,18 @@ final class TabOverview: UIView {
         return presentation.isTransitionRunning
     }
     
-    var previewAspectRatio: CGFloat {
+    var previewContentSize: CGSize {
         guard let contentView = presentationContext?.contentView else {
-            return 1
+            return CGSize(width: 1, height: 1)
         }
-        
-        contentView.layoutIfNeeded()
-        let size = contentView.frame.size
-        let width = max(size.width, 1)
-        return max(size.height, 1) / width
+
+        let frameSize = contentView.frame.size
+        if frameSize.width > 1, frameSize.height > 1 {
+            return frameSize
+        }
+
+        let boundsSize = contentView.bounds.size
+        return CGSize(width: max(boundsSize.width, 1), height: max(boundsSize.height, 1))
     }
     
     let collection: TabOverviewCollection
