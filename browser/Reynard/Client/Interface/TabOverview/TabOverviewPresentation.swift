@@ -85,7 +85,10 @@ final class TabOverviewPresentation {
         
         let totalSpacing = CGFloat(columns - 1) * UX.cardCollectionItemSpacing
         let itemWidth = floor((availableWidth - totalSpacing) / CGFloat(columns))
-        let itemHeight = floor((itemWidth * tabViewAspectRatio) + UX.cardMetadataHeight)
+        let previewInset = TabOverviewCard.webpagePreviewRestingInset
+        let imageWidth = max(itemWidth - (previewInset * 2), 1)
+        let imageHeight = max(floor(imageWidth * tabViewAspectRatio), 1)
+        let itemHeight = imageHeight + (previewInset * 2) + UX.cardMetadataHeight
         return CGSize(width: itemWidth, height: itemHeight)
     }
     
@@ -196,9 +199,9 @@ final class TabOverviewPresentation {
         tabOverview.setMode(overviewMode, animated: false)
         let selectedIndex = dataSource.selectedIndex
         context.containerView.layoutIfNeeded()
+        dataSource.captureThumbnailForVisibleTab(at: selectedIndex)
         let bottomSnapshot = context.browserChrome.bottomToolbarSnapshot()
         context.updateLayout(animated: false, duration: 0)
-        dataSource.captureThumbnailForVisibleTab(at: selectedIndex)
         tabOverview.invalidateCollectionLayouts()
         tabOverview.reloadTabs()
         tabOverview.isHidden = false
@@ -367,8 +370,9 @@ final class TabOverviewPresentation {
         let overviewMode: TabOverview.Mode = dataSource.selectedMode == .private ? .privateTabs : .regularTabs
         tabOverview.setMode(overviewMode, animated: false)
         let selectedIndex = dataSource.selectedIndex
-        context.updateLayout(animated: false, duration: 0)
+        context.containerView.layoutIfNeeded()
         dataSource.captureThumbnailForVisibleTab(at: selectedIndex)
+        context.updateLayout(animated: false, duration: 0)
         tabOverview.invalidateCollectionLayouts()
         tabOverview.reloadTabs()
         tabOverview.isHidden = false
