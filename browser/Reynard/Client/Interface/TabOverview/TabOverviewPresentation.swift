@@ -334,7 +334,7 @@ final class TabOverviewPresentation {
         UIView.animate(withDuration: UX.dismissalAnimationDuration, delay: 0, usingSpringWithDamping: UX.dismissalSpringDamping, initialSpringVelocity: 1, options: [.curveEaseInOut]) {
             pageSnapshotContainer.frame = self.context.contentView.frame
             pageSnapshotContainer.layer.cornerRadius = 0
-            pageSnapshot.frame = pageSnapshotContainer.bounds
+            self.layoutDismissalPreviewSnapshot(pageSnapshot, in: pageSnapshotContainer.bounds)
             bottomSnapshot.alpha = 0
             self.tabOverview.alpha = 0
             for collectionView in self.tabOverview.collection.allCollectionViews {
@@ -497,7 +497,7 @@ final class TabOverviewPresentation {
         UIView.animate(withDuration: UX.dismissalAnimationDuration, delay: 0, usingSpringWithDamping: UX.dismissalSpringDamping, initialSpringVelocity: 1, options: [.curveEaseInOut]) {
             pageSnapshotContainer.frame = self.context.contentView.frame
             pageSnapshotContainer.layer.cornerRadius = 0
-            pageSnapshot.frame = pageSnapshotContainer.bounds
+            self.layoutDismissalPreviewSnapshot(pageSnapshot, in: pageSnapshotContainer.bounds)
             self.tabOverview.alpha = 0
             for collectionView in self.tabOverview.collection.allCollectionViews {
                 collectionView.alpha = 0
@@ -549,10 +549,32 @@ final class TabOverviewPresentation {
         container.clipsToBounds = true
         container.layer.cornerRadius = UX.transitionPreviewCornerRadius
         container.layer.cornerCurve = .continuous
-        snapshot.frame = container.bounds
-        snapshot.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        layoutDismissalPreviewSnapshot(snapshot, in: container.bounds)
         container.addSubview(snapshot)
         return container
+    }
+
+    private func layoutDismissalPreviewSnapshot(_ snapshot: UIView, in bounds: CGRect) {
+        guard let imageView = snapshot as? UIImageView,
+              let image = imageView.image,
+              image.size.width > 0,
+              image.size.height > 0,
+              bounds.width > 0,
+              bounds.height > 0 else {
+            snapshot.frame = bounds
+            return
+        }
+
+        let widthScale = bounds.width / image.size.width
+        let heightScale = bounds.height / image.size.height
+        let scale = max(widthScale, heightScale)
+        let size = CGSize(width: image.size.width * scale, height: image.size.height * scale)
+        snapshot.frame = CGRect(
+            x: bounds.midX - size.width / 2,
+            y: bounds.midY - size.height / 2,
+            width: size.width,
+            height: size.height
+        )
     }
 
     private func bringBrowserChromeToFrontForDismissal() {
