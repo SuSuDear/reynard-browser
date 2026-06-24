@@ -324,6 +324,7 @@ final class TabOverviewPresentation {
         state = .dismissing
         presentationProgress = 0
         context.updateLayout(animated: false, duration: 0)
+        context.contentView.setTransitionTransform(.identity)
         context.tabBar.updateLayout()
 
         context.browserChrome.setChromeTransition(topAlpha: 1, bottomAlpha: 0, bottomTranslationY: 0)
@@ -487,6 +488,7 @@ final class TabOverviewPresentation {
         state = .dismissing
         presentationProgress = 0
         context.updateLayout(animated: false, duration: 0)
+        context.contentView.setTransitionTransform(.identity)
         context.tabBar.updateLayout()
 
         context.contentView.setTransitionHidden(true)
