@@ -12,7 +12,7 @@ final class TabOverviewPresentation {
         static let cardCollectionItemSpacing: CGFloat = 16
         static let cardMinimumPreviewAspectRatio: CGFloat = 0.4
         static let phoneCardTargetWidth: CGFloat = 170
-        static let phoneSingleCardWidthRatio: CGFloat = 0.64
+        static let phoneSingleCardWidthRatio: CGFloat = 0.72
         static let padCardTargetWidth: CGFloat = 250
         static let minimumTabCardColumnCount = 2
         static let cardMetadataHeight: CGFloat = 22
@@ -25,7 +25,7 @@ final class TabOverviewPresentation {
         static let dismissalAnimationDuration: TimeInterval = 0.45
         static let phoneSelectionDismissalAnimationDuration: TimeInterval = 0.62
         static let dismissalSpringDamping: CGFloat = 0.9
-        static let phoneSelectionDismissalSpringDamping: CGFloat = 1
+        static let phoneSelectionDismissalSpringDamping: CGFloat = 0.86
         static let transitionPreviewCornerRadius: CGFloat = 18
     }
 
@@ -335,7 +335,7 @@ final class TabOverviewPresentation {
         tabOverview.bottomToolbar.alpha = 0
         bringBrowserChromeToFrontForDismissal()
 
-        UIView.animate(withDuration: UX.phoneSelectionDismissalAnimationDuration, delay: 0, options: [.curveEaseInOut]) {
+        UIView.animate(withDuration: UX.phoneSelectionDismissalAnimationDuration, delay: 0, usingSpringWithDamping: UX.phoneSelectionDismissalSpringDamping, initialSpringVelocity: 0.6, options: [.curveEaseInOut]) {
             pageSnapshot.frame = self.context.contentView.frame
             pageSnapshot.layer.cornerRadius = 0
             bottomSnapshot.alpha = 0
