@@ -103,6 +103,7 @@ extension BrowserViewController: TabBarDataSource, TabOverviewDataSource, TabOve
             let mode = tabOverview.mode.tabMode
             let tabs = mode == .private ? tabManager.privateTabs : tabManager.regularTabs
             guard !tabs.isEmpty else {
+                createNewTab()
                 return
             }
             
