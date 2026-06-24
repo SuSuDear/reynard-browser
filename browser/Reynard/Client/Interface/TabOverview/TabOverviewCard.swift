@@ -234,6 +234,10 @@ final class TabOverviewCard: UICollectionViewCell {
     }
 
     func makeTransitionSnapshot() -> UIView? {
+        let wasCloseButtonHidden = closeTabButton.isHidden
+        closeTabButton.isHidden = true
+        defer { closeTabButton.isHidden = wasCloseButtonHidden }
+
         layoutIfNeeded()
         contentView.layoutIfNeeded()
 
