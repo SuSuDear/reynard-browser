@@ -89,8 +89,10 @@ final class TabOverview: UIView {
             return 1
         }
         
-        let width = max(contentView.bounds.width, 1)
-        return max(contentView.bounds.height, 1) / width
+        contentView.layoutIfNeeded()
+        let size = contentView.frame.size
+        let width = max(size.width, 1)
+        return max(size.height, 1) / width
     }
     
     let collection: TabOverviewCollection

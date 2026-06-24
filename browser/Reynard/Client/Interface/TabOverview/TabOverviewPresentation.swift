@@ -73,6 +73,7 @@ final class TabOverviewPresentation {
     // MARK: - Layout
 
     func cardSize(in collectionView: UICollectionView) -> CGSize {
+        context.containerView.layoutIfNeeded()
         let horizontalInsets = collectionView.adjustedContentInset.left + collectionView.adjustedContentInset.right
         let availableWidth = collectionView.bounds.width - horizontalInsets
         let tabViewAspectRatio = max(UX.cardMinimumPreviewAspectRatio, tabOverview.previewAspectRatio)
