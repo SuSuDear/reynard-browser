@@ -439,8 +439,6 @@ final class TabOverviewCard: UICollectionViewCell {
                     || velocity.x < -Self.swipeCloseVelocityThreshold)
             if shouldClose {
                 swipeFeedback.impactOccurred()
-                transform = .identity
-                alpha = 1
                 onClose?()
             } else {
                 UIView.animate(
