@@ -156,7 +156,6 @@
 "updates.no_release_notes" = "没有可用的发布说明。";
 "about.engine_version" = "引擎版本";
 "about.view_source_code" = "查看源代码";
-"about.support_project" = "支持此项目";
 
 "common.remove" = "移除";
 "updates.version_plain" = "版本";

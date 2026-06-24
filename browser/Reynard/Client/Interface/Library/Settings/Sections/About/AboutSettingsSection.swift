@@ -13,8 +13,6 @@ struct AboutSettingsSection {
         case appVersion
         case engineVersion
         case sourceCode
-        case supportProject
-        case githubProfile
     }
     
     var rowCount: Int {
@@ -36,10 +34,6 @@ struct AboutSettingsSection {
             return valueCell(title: L10n.string("about.engine_version"), value: GeckoRuntime.version)
         case .sourceCode:
             return linkCell(title: L10n.string("about.view_source_code"))
-        case .supportProject:
-            return linkCell(title: L10n.string("about.support_project"))
-        case .githubProfile:
-            return linkCell(title: "GitHub - @minh-ton")
         }
     }
     
@@ -55,11 +49,7 @@ struct AboutSettingsSection {
     private func url(for row: Row) -> URL? {
         switch row {
         case .sourceCode:
-            return URL(string: "https://github.com/minh-ton/reynard-browser")
-        case .supportProject:
-            return URL(string: "https://buymeacoffee.com/hnimnot")
-        case .githubProfile:
-            return URL(string: "https://github.com/minh-ton")
+            return URL(string: "https://github.com/SuSuDear/reynard-browser")
         case .appVersion, .engineVersion:
             return nil
         }

@@ -156,7 +156,6 @@
 "updates.no_release_notes" = "No release notes available.";
 "about.engine_version" = "Engine Version";
 "about.view_source_code" = "View Source Code";
-"about.support_project" = "Support The Project";
 
 "common.remove" = "Remove";
 "updates.version_plain" = "Version";
