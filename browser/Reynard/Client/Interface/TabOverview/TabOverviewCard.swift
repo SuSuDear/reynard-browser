@@ -196,6 +196,7 @@ final class TabOverviewCard: UICollectionViewCell {
     func configure(with tab: Tab) {
         tabTitleLabel.text = tab.title.isEmpty ? L10n.string("common.homepage") : tab.title
         webpagePreviewImageView.image = tab.thumbnail
+        closeTabButton.isHidden = tab.thumbnail == nil
         faviconImageView.image = tab.favicon ?? Self.fallbackFaviconImage
     }
 
