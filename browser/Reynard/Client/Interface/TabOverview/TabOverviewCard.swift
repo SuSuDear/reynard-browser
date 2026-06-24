@@ -264,7 +264,9 @@ final class TabOverviewCard: UICollectionViewCell {
 
     func setTransitionState(_ state: TransitionState) {
         transitionState = state
-        contentView.alpha = state == .visible ? 1 : 0
+        let alpha: CGFloat = state == .visible ? 1 : 0
+        contentView.alpha = alpha
+        closeTabButton.alpha = alpha
     }
 
     func setReorderState(_ state: ReorderState, animated: Bool) {
@@ -273,8 +275,7 @@ final class TabOverviewCard: UICollectionViewCell {
     }
 
     func isCloseButton(at point: CGPoint) -> Bool {
-        let pointInPreview = convert(point, to: webpagePreviewClippingView)
-        return closeTabButton.frame.contains(pointInPreview)
+        closeTabButton.frame.contains(point)
     }
 
     // MARK: - View Setup
@@ -291,8 +292,8 @@ final class TabOverviewCard: UICollectionViewCell {
         webpagePreviewRegionView.addSubview(webpagePreviewShadowView)
         webpagePreviewRegionView.addSubview(webpagePreviewClippingView)
         webpagePreviewClippingView.addSubview(webpagePreviewImageView)
-        webpagePreviewClippingView.addSubview(closeTabButton)
         contentView.addSubview(tabMetadataContainerView)
+        addSubview(closeTabButton)
         tabMetadataContainerView.addSubview(tabMetadataStackView)
         tabMetadataStackView.addArrangedSubview(faviconImageView)
         tabMetadataStackView.addArrangedSubview(tabTitleLabel)
@@ -324,8 +325,8 @@ final class TabOverviewCard: UICollectionViewCell {
             webpagePreviewImageView.leadingAnchor.constraint(equalTo: webpagePreviewClippingView.leadingAnchor),
             webpagePreviewImageView.trailingAnchor.constraint(equalTo: webpagePreviewClippingView.trailingAnchor),
             webpagePreviewImageView.bottomAnchor.constraint(equalTo: webpagePreviewClippingView.bottomAnchor),
-            closeTabButton.topAnchor.constraint(equalTo: webpagePreviewImageView.topAnchor, constant: UX.closeButtonTopInset),
-            closeTabButton.trailingAnchor.constraint(equalTo: webpagePreviewImageView.trailingAnchor, constant: -UX.closeButtonTrailingInset),
+            closeTabButton.topAnchor.constraint(equalTo: webpagePreviewClippingView.topAnchor, constant: UX.closeButtonTopInset),
+            closeTabButton.trailingAnchor.constraint(equalTo: webpagePreviewClippingView.trailingAnchor, constant: -UX.closeButtonTrailingInset),
             closeTabButton.widthAnchor.constraint(equalToConstant: UX.closeButtonSideLength),
             closeTabButton.heightAnchor.constraint(equalToConstant: UX.closeButtonSideLength),
             tabMetadataContainerView.topAnchor.constraint(equalTo: webpagePreviewRegionView.bottomAnchor, constant: UX.tabMetadataTopSpacing),
