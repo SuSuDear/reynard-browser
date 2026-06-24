@@ -437,10 +437,7 @@ final class TabOverviewCard: UICollectionViewCell {
                     self?.webpagePreviewRegionView.alpha = 0
                 }
                 swipeAnimator?.addCompletion { [weak self] _ in
-                    guard let self else { return }
-                    self.onClose?()
-                    self.webpagePreviewRegionView.transform = .identity
-                    self.webpagePreviewRegionView.alpha = 1
+                    self?.onClose?()
                 }
                 swipeAnimator?.startAnimation()
             } else {

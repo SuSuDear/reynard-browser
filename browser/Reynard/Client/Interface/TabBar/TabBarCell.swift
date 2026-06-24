@@ -278,10 +278,7 @@ final class TabBarCell: UICollectionViewCell {
                     self?.alpha = 0
                 }
                 swipeAnimator?.addCompletion { [weak self] _ in
-                    guard let self else { return }
-                    self.closeHandler?()
-                    self.transform = .identity
-                    self.alpha = 1
+                    self?.closeHandler?()
                 }
                 swipeAnimator?.startAnimation()
             } else {
