@@ -7,6 +7,8 @@
 "address_bar.request_mobile_website" = "Request Mobile Website";
 "address_bar.request_desktop_website" = "Request Desktop Website";
 "address_bar.website_settings" = "Website Settings";
+"address_bar.show_top_address_bar" = "Show Top Address Bar";
+"address_bar.show_bottom_tab_bar" = "Show Bottom Tab Bar";
 "open_in.no_link" = "No link was provided.";
 "open_in.unable_to_open" = "Unable to open Reynard.";
 "common.delete" = "Delete";

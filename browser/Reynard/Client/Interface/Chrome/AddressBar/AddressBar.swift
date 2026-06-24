@@ -12,6 +12,7 @@ protocol AddressBarDelegate: AnyObject {
     func addressBarAddonItems(_ addressBar: AddressBar) -> [AddressBarMenu.AddonItem]
     func addressBar(_ addressBar: AddressBar, didSelectAddon item: AddonMenuItem)
     func addressBarDidRequestWebsiteModeChange(_ addressBar: AddressBar)
+    func addressBar(_ addressBar: AddressBar, didRequestAddressBarPosition position: BrowserChromePosition)
     func addressBarDidRequestWebsiteSettings(_ addressBar: AddressBar)
     func addressBar(_ addressBar: AddressBar, didRequestBookmarkInFavorites favorites: Bool)
 }
@@ -282,10 +283,11 @@ final class AddressBar: UIView {
         applyState()
     }
     
-    func updateMenu(url: String?, usesDesktopWebsite: Bool?) {
+    func updateMenu(url: String?, usesDesktopWebsite: Bool?, addressBarPosition: BrowserChromePosition) {
         addonsMenu = AddressBarMenu.makeMenu(
             selectedURL: url,
             usesDesktopWebsite: usesDesktopWebsite,
+            addressBarPosition: addressBarPosition,
             addonItems: delegate?.addressBarAddonItems(self) ?? [],
             onAddonSelected: { [weak self] item in
                 guard let self else { return }
@@ -294,6 +296,10 @@ final class AddressBar: UIView {
             onChangeWebsiteMode: { [weak self] in
                 guard let self else { return }
                 self.delegate?.addressBarDidRequestWebsiteModeChange(self)
+            },
+            onChangeAddressBarPosition: { [weak self] position in
+                guard let self else { return }
+                self.delegate?.addressBar(self, didRequestAddressBarPosition: position)
             },
             onWebsiteSettings: { [weak self] in
                 guard let self else { return }

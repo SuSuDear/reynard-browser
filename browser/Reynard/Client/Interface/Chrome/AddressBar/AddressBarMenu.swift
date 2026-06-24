@@ -21,9 +21,11 @@ enum AddressBarMenu {
     static func makeMenu(
         selectedURL: String?,
         usesDesktopWebsite: Bool?,
+        addressBarPosition: BrowserChromePosition,
         addonItems: [AddonItem],
         onAddonSelected: @escaping (AddonMenuItem) -> Void,
         onChangeWebsiteMode: @escaping () -> Void,
+        onChangeAddressBarPosition: @escaping (BrowserChromePosition) -> Void,
         onWebsiteSettings: @escaping () -> Void,
         onBookmark: @escaping (Bool) -> Void
     ) -> UIMenu {
@@ -79,6 +81,16 @@ enum AddressBarMenu {
         }
         
         var settingsActions: [UIMenuElement] = []
+        let targetAddressBarPosition: BrowserChromePosition = addressBarPosition == .bottom ? .top : .bottom
+        let addressBarPositionTitle = targetAddressBarPosition == .top
+        ? L10n.string("address_bar.show_top_address_bar")
+        : L10n.string("address_bar.show_bottom_tab_bar")
+        let addressBarPositionImageName = targetAddressBarPosition == .top
+        ? "reynard.platter.filled.top.iphone"
+        : "reynard.platter.filled.bottom.iphone"
+        settingsActions.append(UIAction(title: addressBarPositionTitle, image: UIImage(named: addressBarPositionImageName)) { _ in
+            onChangeAddressBarPosition(targetAddressBarPosition)
+        })
         if url?.host != nil {
             settingsActions.append(UIAction(title: L10n.string("address_bar.website_settings"), image: UIImage(named: "reynard.gear")) { _ in
                 onWebsiteSettings()

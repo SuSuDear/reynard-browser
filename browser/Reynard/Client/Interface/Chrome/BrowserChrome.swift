@@ -241,8 +241,12 @@ final class BrowserChrome: UIView {
         )
     }
     
-    func updateAddressBarMenu(url: String?, usesDesktopWebsite: Bool?) {
-        addressBar.updateMenu(url: url, usesDesktopWebsite: usesDesktopWebsite)
+    func updateAddressBarMenu(url: String?, usesDesktopWebsite: Bool?, addressBarPosition: BrowserChromePosition) {
+        addressBar.updateMenu(
+            url: url,
+            usesDesktopWebsite: usesDesktopWebsite,
+            addressBarPosition: addressBarPosition
+        )
     }
     
     func setAddressBarLoadingProgress(_ progress: Float, isLoading: Bool) {

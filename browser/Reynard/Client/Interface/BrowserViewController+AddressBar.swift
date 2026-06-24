@@ -38,7 +38,8 @@ extension BrowserViewController: AddressBarDelegate, AddressBarGestureDelegate {
         }
         browserChrome.updateAddressBarMenu(
             url: selectedURL,
-            usesDesktopWebsite: usesDesktopWebsite
+            usesDesktopWebsite: usesDesktopWebsite,
+            addressBarPosition: Prefs.AppearanceSettings.addressBarPosition
         )
     }
     
@@ -69,6 +70,11 @@ extension BrowserViewController: AddressBarDelegate, AddressBarGestureDelegate {
         refreshAddressBar()
     }
     
+    func addressBar(_ addressBar: AddressBar, didRequestAddressBarPosition position: BrowserChromePosition) {
+        Prefs.AppearanceSettings.addressBarPosition = position
+        refreshAddressBar()
+    }
+
     func addressBarDidRequestWebsiteSettings(_ addressBar: AddressBar) {
         presentWebsiteSettings()
     }
