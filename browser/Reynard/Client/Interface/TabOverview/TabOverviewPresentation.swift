@@ -197,9 +197,9 @@ final class TabOverviewPresentation {
         tabOverview.setMode(overviewMode, animated: false)
         let selectedIndex = dataSource.selectedIndex
         context.containerView.layoutIfNeeded()
+        dataSource.captureThumbnailForVisibleTab(at: selectedIndex)
         let bottomSnapshot = context.browserChrome.bottomToolbarSnapshot()
         context.updateLayout(animated: false, duration: 0)
-        dataSource.captureThumbnailForVisibleTab(at: selectedIndex)
         tabOverview.invalidateCollectionLayouts()
         tabOverview.reloadTabs()
         tabOverview.isHidden = false
@@ -370,8 +370,9 @@ final class TabOverviewPresentation {
         let overviewMode: TabOverview.Mode = dataSource.selectedMode == .private ? .privateTabs : .regularTabs
         tabOverview.setMode(overviewMode, animated: false)
         let selectedIndex = dataSource.selectedIndex
-        context.updateLayout(animated: false, duration: 0)
+        context.containerView.layoutIfNeeded()
         dataSource.captureThumbnailForVisibleTab(at: selectedIndex)
+        context.updateLayout(animated: false, duration: 0)
         tabOverview.invalidateCollectionLayouts()
         tabOverview.reloadTabs()
         tabOverview.isHidden = false
