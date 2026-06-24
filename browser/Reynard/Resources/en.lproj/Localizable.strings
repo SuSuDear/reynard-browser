@@ -166,7 +166,6 @@
 "addons.unsupported_status" = "Unsupported";
 "addons.loading" = "Loading Add-ons...";
 "addons.none_installed" = "No Add-ons Installed";
-"addons.allow_unsigned_extensions" = "Allow Unsigned Extensions";
 "addons.discover" = "Discover Add-ons...";
 "addons.install_from_file" = "Install Add-on From File...";
 "addons.installing" = "Installing Add-on...";
