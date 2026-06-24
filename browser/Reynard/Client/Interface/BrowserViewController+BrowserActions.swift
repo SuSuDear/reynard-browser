@@ -8,7 +8,7 @@
 import UIKit
 
 extension BrowserViewController {
-    func presentLibrary(initialSection: LibrarySection = .bookmarks) {
+    func presentLibrary(initialSection: LibrarySection? = nil) {
         if initialSection == .downloads {
             DownloadStore.shared.markCompletedAsViewed()
             if browserLayout.interfaceIdiom == .pad,

@@ -8,6 +8,8 @@
 import UIKit
 
 final class LibraryViewController: UITabBarController, UITabBarControllerDelegate, UINavigationControllerDelegate {
+    private static let lastSelectedSectionKey = "Library.lastSelectedSection"
+
     private let initialSection: LibrarySection
     private let isPrivateMode: Bool
     private let onClose: (() -> Void)?
@@ -18,8 +20,8 @@ final class LibraryViewController: UITabBarController, UITabBarControllerDelegat
     
     // MARK: - Lifecycle
     
-    init(initialSection: LibrarySection = .bookmarks, isPrivateMode: Bool = false, onClose: (() -> Void)? = nil) {
-        self.initialSection = initialSection
+    init(initialSection: LibrarySection? = nil, isPrivateMode: Bool = false, onClose: (() -> Void)? = nil) {
+        self.initialSection = initialSection ?? Self.lastSelectedSection
         self.isPrivateMode = isPrivateMode
         self.onClose = onClose
         super.init(nibName: nil, bundle: nil)
@@ -55,6 +57,7 @@ final class LibraryViewController: UITabBarController, UITabBarControllerDelegat
     }
     
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+        saveSelectedSection()
         updateNavigationTitle()
         removeNavigationActionsIfNeeded()
     }
@@ -71,6 +74,7 @@ final class LibraryViewController: UITabBarController, UITabBarControllerDelegat
         setViewControllers(makeViewControllers(), animated: false)
         let selectedSection = visibleSections.contains(initialSection) ? initialSection : .bookmarks
         selectedIndex = visibleSections.firstIndex(of: selectedSection) ?? 0
+        saveSelectedSection()
     }
     
     private func installCloseButtonIfNeeded() {
@@ -111,6 +115,20 @@ final class LibraryViewController: UITabBarController, UITabBarControllerDelegat
         }
     }
     
+    private static var lastSelectedSection: LibrarySection {
+        let rawValue = UserDefaults.standard.integer(forKey: lastSelectedSectionKey)
+        return LibrarySection(rawValue: rawValue) ?? .bookmarks
+    }
+
+    private func saveSelectedSection() {
+        guard let tag = viewControllers?[safe: selectedIndex]?.tabBarItem.tag,
+              let section = LibrarySection(rawValue: tag) else {
+            return
+        }
+
+        UserDefaults.standard.set(section.rawValue, forKey: Self.lastSelectedSectionKey)
+    }
+
     // MARK: - Navigation
     
     private func updateNavigationTitle() {
