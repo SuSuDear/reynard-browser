@@ -346,7 +346,7 @@ final class TabOverviewCard: UICollectionViewCell {
         let pan = UIPanGestureRecognizer(target: self, action: #selector(handleSwipeToClose(_:)))
         pan.delegate = swipeGestureDelegate
         pan.maximumNumberOfTouches = 1
-        contentView.addGestureRecognizer(pan)
+        addGestureRecognizer(pan)
         swipePanGesture = pan
     }
 
@@ -406,8 +406,8 @@ final class TabOverviewCard: UICollectionViewCell {
     }
 
     @objc private func handleSwipeToClose(_ gesture: UIPanGestureRecognizer) {
-        let translation = gesture.translation(in: contentView)
-        let velocity = gesture.velocity(in: contentView)
+        let translation = gesture.translation(in: self)
+        let velocity = gesture.velocity(in: self)
 
         switch gesture.state {
         case .began:
@@ -416,9 +416,9 @@ final class TabOverviewCard: UICollectionViewCell {
         case .changed:
             let dx = translation.x
             let absorbed = dx <= 0 ? dx : dx * 0.35
-            contentView.transform = CGAffineTransform(translationX: absorbed, y: 0)
+            transform = CGAffineTransform(translationX: absorbed, y: 0)
             let progress = max(0, min(1, abs(absorbed) / 160))
-            contentView.alpha = 1 - 0.6 * progress
+            alpha = 1 - 0.6 * progress
         case .ended, .cancelled:
             let shouldClose = gesture.state != .cancelled
                 && translation.x < 0
@@ -433,8 +433,8 @@ final class TabOverviewCard: UICollectionViewCell {
                     controlPoint2: CGPoint(x: 1, y: 1)
                 )
                 swipeAnimator?.addAnimations { [weak self] in
-                    self?.contentView.transform = CGAffineTransform(translationX: exitOffset, y: 0)
-                    self?.contentView.alpha = 0
+                    self?.transform = CGAffineTransform(translationX: exitOffset, y: 0)
+                    self?.alpha = 0
                 }
                 swipeAnimator?.addCompletion { [weak self] _ in
                     self?.onClose?()
@@ -448,8 +448,8 @@ final class TabOverviewCard: UICollectionViewCell {
                     initialSpringVelocity: 0.4,
                     options: [.beginFromCurrentState, .allowUserInteraction]
                 ) { [weak self] in
-                    self?.contentView.transform = .identity
-                    self?.contentView.alpha = 1
+                    self?.transform = .identity
+                    self?.alpha = 1
                 }
             }
         default:
@@ -475,7 +475,7 @@ extension TabOverviewCard {
                   pan === owner.swipePanGesture else {
                 return true
             }
-            let velocity = pan.velocity(in: owner.contentView)
+            let velocity = pan.velocity(in: owner)
             return abs(velocity.x) > abs(velocity.y) && abs(velocity.x) > 80
         }
 
