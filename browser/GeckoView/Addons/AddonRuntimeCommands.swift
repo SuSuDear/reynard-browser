@@ -41,7 +41,9 @@ public extension AddonRuntime {
     }
     
     func install(url: String, installMethod: AddonInstallMethod? = nil, allowUnsignedExtensions: Bool = false) async throws -> Addon {
-        try await setUnsignedExtensionInstallAllowed(allowUnsignedExtensions)
+        if allowUnsignedExtensions {
+            try? await setUnsignedExtensionInstallAllowed(true)
+        }
         installCounter += 1
         let response = try await GeckoEventDispatcherWrapper.runtimeInstance.query(
             type: "GeckoView:WebExtension:Install",
