@@ -419,7 +419,12 @@ final class AddonsPreferencesViewController: SettingsTableViewController {
                     guard !presentation.isUserCancelled else {
                         return
                     }
-                    AlertPresenter.show(title: nil, message: presentation.alertMessage)
+                    let debugDescription = AddonErrorPresenter.installErrorDebugDescription(from: error)
+                    var message = presentation.alertMessage
+                    if !debugDescription.isEmpty {
+                        message += "\n\n\(debugDescription)"
+                    }
+                    AlertPresenter.show(title: nil, message: message)
                 }
             }
         }

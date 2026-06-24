@@ -43,6 +43,22 @@ public struct AddonErrorPresenter {
             cancelledByUser: details.cancelledByUser
         )
     }
+
+    public static func installErrorDebugDescription(from error: Error) -> String {
+        let details = installErrorDetails(from: error)
+        var parts = [String]()
+        if let code = details.code {
+            parts.append("code=\(code)")
+        }
+        let description = error.localizedDescription.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !description.isEmpty {
+            parts.append("description=\(description)")
+        }
+        if let value = Mirror(reflecting: error).descendant("value") {
+            parts.append("value=\(value)")
+        }
+        return parts.joined(separator: "\n")
+    }
     
     private static func installErrorDetails(from error: Error) -> (code: String?, cancelledByUser: Bool) {
         guard let value = Mirror(reflecting: error).descendant("value") as? [String: Any?] else {
