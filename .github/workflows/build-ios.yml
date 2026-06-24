@@ -1,7 +1,7 @@
 name: iOS Build (Experimental)
 
-# Manual-only workflow that attempts the full Reynard build pipeline:
-# Cargo (idevice) -> Gecko (Firefox 151) -> xcodebuild Reynard.app
+# Automatic workflow that attempts the full Reynard build pipeline:
+# Cargo (idevice) -> prebuilt Gecko dist -> xcodebuild Reynard.app
 #
 # IMPORTANT — read before running:
 #   * First run takes ~3-4 hours of macOS runner time (currently 10x billing).
@@ -15,24 +15,8 @@ name: iOS Build (Experimental)
 # service with code-signing support (Codemagic, Bitrise, Xcode Cloud).
 
 on:
-  # Auto-run when the workflow file itself changes. This lets the agent push
-  # iterative fixes during CI debugging without requiring a manual UI click,
-  # while normal source-code commits still skip the expensive macOS build.
-  # Remove this trigger once the build is stable.
   push:
     branches: [main]
-    paths:
-      - '.github/workflows/build-ios.yml'
-  workflow_dispatch:
-    inputs:
-      run_gecko_build:
-        description: 'Build Gecko engine (uncheck to reuse cache only)'
-        type: boolean
-        default: true
-      run_xcodebuild:
-        description: 'Run xcodebuild after Gecko (unsigned)'
-        type: boolean
-        default: true
 
 permissions:
   contents: read
@@ -170,7 +154,7 @@ jobs:
           ./tools/development/build-idevice.sh
 
       - name: Cache Gecko build directory
-        if: ${{ env.USE_PREBUILT_GECKO != 'true' && (github.event_name == 'push' || inputs.run_gecko_build) }}
+        if: ${{ env.USE_PREBUILT_GECKO != 'true' }}
         id: cache-gecko-build
         uses: actions/cache@v4
         with:
@@ -185,7 +169,7 @@ jobs:
             gecko-build-${{ runner.os }}-${{ steps.gecko-tag.outputs.tag }}-
 
       - name: Fetch Mozilla toolchain artifacts (clang + friends)
-        if: ${{ env.USE_PREBUILT_GECKO != 'true' && (github.event_name == 'push' || inputs.run_gecko_build) }}
+        if: ${{ env.USE_PREBUILT_GECKO != 'true' }}
         working-directory: engine/firefox
         run: |
           # We skip `./mach bootstrap` entirely because:
@@ -203,12 +187,12 @@ jobs:
           ./mach configure 2>&1 | tail -200
 
       - name: Build Gecko engine
-        if: ${{ env.USE_PREBUILT_GECKO != 'true' && (github.event_name == 'push' || inputs.run_gecko_build) }}
+        if: ${{ env.USE_PREBUILT_GECKO != 'true' }}
         run: |
           ./tools/development/build-gecko.sh
 
       - name: Inspect Gecko output
-        if: ${{ env.USE_PREBUILT_GECKO != 'true' && (github.event_name == 'push' || inputs.run_gecko_build) }}
+        if: ${{ env.USE_PREBUILT_GECKO != 'true' }}
         run: |
           OBJDIR="engine/firefox/obj-aarch64-apple-ios"
           if [ ! -d "$OBJDIR/dist/bin" ]; then
@@ -255,7 +239,6 @@ jobs:
           find "$OBJDIR/dist/bin" -maxdepth 1 -type l -ls | head -40 || true
 
       - name: Run xcodebuild (unsigned)
-        if: ${{ github.event_name == 'push' || inputs.run_xcodebuild }}
         working-directory: browser
         env:
           GECKO_DIST: ${{ github.workspace }}/engine/firefox/obj-aarch64-apple-ios/dist
@@ -306,7 +289,6 @@ jobs:
           fi
 
       - name: Package .app into .tipa
-        if: ${{ github.event_name == 'push' || inputs.run_xcodebuild }}
         working-directory: browser/build/Build/Products/Release-iphoneos
         env:
           ROOT_DIR: ${{ github.workspace }}
@@ -369,7 +351,6 @@ jobs:
           ldid -e "Payload/Reynard.app/ptrace_jit" || true
 
       - name: Upload TrollStore bundle (.tipa)
-        if: ${{ github.event_name == 'push' || inputs.run_xcodebuild }}
         uses: actions/upload-artifact@v4
         with:
           name: Reynard-TrollStore-tipa
