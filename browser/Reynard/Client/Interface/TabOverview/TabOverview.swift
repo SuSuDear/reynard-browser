@@ -242,8 +242,8 @@ final class TabOverview: UIView {
         collection.itemIndex(forTabAt: index, mode: mode)
     }
     
-    func prepareDismissSelection(to index: Int, mode: TabMode, previewImage: UIImage?) {
-        presentation.prepareDismissSelection(to: index, mode: mode, previewImage: previewImage)
+    func prepareDismissSelection(to index: Int, mode: TabMode, previewImage: UIImage?, previewOnly: Bool = false) {
+        presentation.prepareDismissSelection(to: index, mode: mode, previewImage: previewImage, previewOnly: previewOnly)
     }
     
     // MARK: - View Setup

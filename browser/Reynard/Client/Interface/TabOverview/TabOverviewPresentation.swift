@@ -52,6 +52,7 @@ final class TabOverviewPresentation {
     private var pendingSelectionTabIndex: Int?
     private var pendingSelectionTabMode: TabMode?
     private var pendingSelectionPreviewImage: UIImage?
+    private var usesPendingSelectionPreviewOnly = false
 
     private(set) var state: State = .dismissed
 
@@ -99,13 +100,14 @@ final class TabOverviewPresentation {
 
     // MARK: - Selection
 
-    func prepareDismissSelection(to index: Int, mode: TabMode, previewImage: UIImage?) {
+    func prepareDismissSelection(to index: Int, mode: TabMode, previewImage: UIImage?, previewOnly: Bool = false) {
         let selectedIndex = dataSource.selectedMode == mode ? dataSource.selectedIndex : nil
         dismissalTargetTabIndex = index
         dismissalTargetTabMode = mode
         pendingSelectionTabIndex = index == selectedIndex ? nil : index
         pendingSelectionTabMode = mode
         pendingSelectionPreviewImage = previewImage
+        usesPendingSelectionPreviewOnly = previewOnly
     }
 
     // MARK: - Presentation
@@ -135,6 +137,7 @@ final class TabOverviewPresentation {
             pendingSelectionTabIndex = nil
             pendingSelectionTabMode = nil
             pendingSelectionPreviewImage = nil
+            usesPendingSelectionPreviewOnly = false
             dataSource.captureThumbnailForVisibleTab(at: dataSource.selectedIndex)
             tabOverview.reloadTabs()
             tabOverview.isHidden = false
@@ -296,7 +299,7 @@ final class TabOverviewPresentation {
 
         selectedCell.setTransitionState(.hiddenForAnimation)
 
-        let pageSnapshot = selectedCell.makeWebpagePreviewRegionSnapshot() ?? makeDismissalPreviewSnapshot(for: overviewIndex)
+        let pageSnapshot = makeDismissalPageSnapshot(from: selectedCell, at: overviewIndex)
         guard let pageSnapshot else {
             state = .dismissed
             applyPresentationProgress(0)
@@ -465,7 +468,7 @@ final class TabOverviewPresentation {
 
         selectedCell.setTransitionState(.hiddenForAnimation)
 
-        let pageSnapshot = selectedCell.makeWebpagePreviewRegionSnapshot() ?? makeDismissalPreviewSnapshot(for: overviewIndex)
+        let pageSnapshot = makeDismissalPageSnapshot(from: selectedCell, at: overviewIndex)
         guard let pageSnapshot else {
             state = .dismissed
             applyPresentationProgress(0)
@@ -528,20 +531,36 @@ final class TabOverviewPresentation {
         return mode == .private ? dataSource.privateTabs : dataSource.regularTabs
     }
 
+    private func makeDismissalPageSnapshot(from selectedCell: TabOverviewCard, at index: Int) -> UIView? {
+        if usesPendingSelectionPreviewOnly {
+            return makeDismissalPreviewSnapshot(for: index)
+        }
+        return selectedCell.makeWebpagePreviewRegionSnapshot() ?? makeDismissalPreviewSnapshot(for: index)
+    }
+
     private func makeDismissalPreviewSnapshot(for index: Int) -> UIView? {
         let mode = dismissalTargetTabMode ?? dataSource.selectedMode
         let tabs = tabs(for: mode)
-        let image = pendingSelectionPreviewImage ?? tabs[safe: index]?.thumbnail
-        guard let image else {
+        let image = usesPendingSelectionPreviewOnly ? pendingSelectionPreviewImage : (pendingSelectionPreviewImage ?? tabs[safe: index]?.thumbnail)
+        if let image {
+            let imageView = UIImageView(image: image)
+            imageView.contentMode = .scaleAspectFill
+            imageView.clipsToBounds = true
+            imageView.layer.cornerRadius = UX.transitionPreviewCornerRadius
+            imageView.layer.cornerCurve = .continuous
+            return imageView
+        }
+
+        guard usesPendingSelectionPreviewOnly else {
             return nil
         }
 
-        let imageView = UIImageView(image: image)
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = UX.transitionPreviewCornerRadius
-        imageView.layer.cornerCurve = .continuous
-        return imageView
+        let blankView = UIView()
+        blankView.backgroundColor = .systemBackground
+        blankView.clipsToBounds = true
+        blankView.layer.cornerRadius = UX.transitionPreviewCornerRadius
+        blankView.layer.cornerCurve = .continuous
+        return blankView
     }
 
     private func makeDismissalPreviewSnapshotContainer(wrapping snapshot: UIView, frame: CGRect) -> UIView {
@@ -615,6 +634,7 @@ final class TabOverviewPresentation {
             dismissalTargetTabMode = nil
             pendingSelectionTabMode = nil
             pendingSelectionPreviewImage = nil
+            usesPendingSelectionPreviewOnly = false
         }
 
         let selectedIndex = pendingSelectionTabMode == dataSource.selectedMode ? dataSource.selectedIndex : nil
