@@ -300,7 +300,7 @@ final class TabOverviewPresentation {
 
         selectedCell.setTransitionState(.hiddenForAnimation)
 
-        let pageSnapshot = makeDismissalPreviewSnapshot(for: overviewIndex) ?? selectedCell.makeWebpagePreviewRegionSnapshot()
+        let pageSnapshot = selectedCell.makeWebpagePreviewRegionSnapshot() ?? makeDismissalPreviewSnapshot(for: overviewIndex)
         guard let pageSnapshot else {
             state = .dismissed
             applyPresentationProgress(0)
@@ -467,7 +467,7 @@ final class TabOverviewPresentation {
 
         selectedCell.setTransitionState(.hiddenForAnimation)
 
-        let pageSnapshot = makeDismissalPreviewSnapshot(for: overviewIndex) ?? selectedCell.makeWebpagePreviewRegionSnapshot()
+        let pageSnapshot = selectedCell.makeWebpagePreviewRegionSnapshot() ?? makeDismissalPreviewSnapshot(for: overviewIndex)
         guard let pageSnapshot else {
             state = .dismissed
             applyPresentationProgress(0)
