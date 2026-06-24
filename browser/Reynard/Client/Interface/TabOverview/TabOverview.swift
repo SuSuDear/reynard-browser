@@ -84,26 +84,15 @@ final class TabOverview: UIView {
         return presentation.isTransitionRunning
     }
     
-    var previewContentSize: CGSize {
-        if let cachedPreviewContentSize = cachedPreviewContentSize {
-            return cachedPreviewContentSize
-        }
-
+    var previewAspectRatio: CGFloat {
         guard let contentView = presentationContext?.contentView else {
-            return CGSize(width: 1, height: 1)
+            return 1
         }
-
-        let frameSize = contentView.frame.size
-        if frameSize.width > 1, frameSize.height > 1 {
-            return frameSize
-        }
-
-        let boundsSize = contentView.bounds.size
-        return CGSize(width: max(boundsSize.width, 1), height: max(boundsSize.height, 1))
+        
+        let width = max(contentView.bounds.width, 1)
+        return max(contentView.bounds.height, 1) / width
     }
-
-    private var cachedPreviewContentSize: CGSize?
-
+    
     let collection: TabOverviewCollection
     let topToolbar = TabOverviewTopToolbar()
     let bottomToolbar = TabOverviewBottomToolbar()
@@ -225,13 +214,6 @@ final class TabOverview: UIView {
         collection.invalidateCardLayouts()
     }
     
-    func updatePreviewContentSize(_ size: CGSize) {
-        guard size.width > 1, size.height > 1 else {
-            return
-        }
-        cachedPreviewContentSize = size
-    }
-
     // MARK: - Presentation Access
     
     func currentCollectionView() -> UICollectionView {
@@ -242,8 +224,8 @@ final class TabOverview: UIView {
         collection.itemIndex(forTabAt: index, mode: mode)
     }
     
-    func prepareDismissSelection(to index: Int, mode: TabMode, previewImage: UIImage?, previewOnly: Bool = false) {
-        presentation.prepareDismissSelection(to: index, mode: mode, previewImage: previewImage, previewOnly: previewOnly)
+    func prepareDismissSelection(to index: Int, mode: TabMode, previewImage: UIImage?) {
+        presentation.prepareDismissSelection(to: index, mode: mode, previewImage: previewImage)
     }
     
     // MARK: - View Setup

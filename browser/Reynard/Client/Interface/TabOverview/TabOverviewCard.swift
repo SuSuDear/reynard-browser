@@ -46,7 +46,6 @@ final class TabOverviewCard: UICollectionViewCell {
     }
 
     static let reuseIdentifier = "TabOverviewCard"
-    static let webpagePreviewRestingInset = UX.webpagePreviewRestingInset
 
     var onClose: (() -> Void)?
 
@@ -188,8 +187,6 @@ final class TabOverviewCard: UICollectionViewCell {
         setReorderState(.resting, animated: false)
         swipeAnimator?.stopAnimation(true)
         swipeAnimator = nil
-        transform = .identity
-        alpha = 1
         webpagePreviewRegionView.transform = .identity
         webpagePreviewRegionView.alpha = 1
     }
@@ -199,10 +196,7 @@ final class TabOverviewCard: UICollectionViewCell {
     func configure(with tab: Tab) {
         tabTitleLabel.text = tab.title.isEmpty ? L10n.string("common.homepage") : tab.title
         webpagePreviewImageView.image = tab.thumbnail
-        closeTabButton.isHidden = tab.thumbnail == nil
         faviconImageView.image = tab.favicon ?? Self.fallbackFaviconImage
-        setNeedsLayout()
-        layoutIfNeeded()
     }
 
     var previewImage: UIImage? {
@@ -216,10 +210,7 @@ final class TabOverviewCard: UICollectionViewCell {
     }
 
     func makeWebpagePreviewRegionSnapshot() -> UIView? {
-        let wasCloseButtonHidden = closeTabButton.isHidden
-        closeTabButton.isHidden = true
-        defer { closeTabButton.isHidden = wasCloseButtonHidden }
-        return webpagePreviewRegionView.snapshotView(afterScreenUpdates: false)
+        webpagePreviewRegionView.snapshotView(afterScreenUpdates: false)
     }
 
     func transitionSnapshotFrame(in targetView: UIView) -> CGRect {
@@ -239,10 +230,6 @@ final class TabOverviewCard: UICollectionViewCell {
     }
 
     func makeTransitionSnapshot() -> UIView? {
-        let wasCloseButtonHidden = closeTabButton.isHidden
-        closeTabButton.isHidden = true
-        defer { closeTabButton.isHidden = wasCloseButtonHidden }
-
         layoutIfNeeded()
         contentView.layoutIfNeeded()
 
@@ -269,9 +256,7 @@ final class TabOverviewCard: UICollectionViewCell {
 
     func setTransitionState(_ state: TransitionState) {
         transitionState = state
-        let alpha: CGFloat = state == .visible ? 1 : 0
-        contentView.alpha = alpha
-        closeTabButton.alpha = alpha
+        contentView.alpha = state == .visible ? 1 : 0
     }
 
     func setReorderState(_ state: ReorderState, animated: Bool) {
@@ -280,7 +265,8 @@ final class TabOverviewCard: UICollectionViewCell {
     }
 
     func isCloseButton(at point: CGPoint) -> Bool {
-        closeTabButton.frame.contains(point)
+        let pointInPreview = convert(point, to: webpagePreviewClippingView)
+        return closeTabButton.frame.contains(pointInPreview)
     }
 
     // MARK: - View Setup
@@ -297,8 +283,8 @@ final class TabOverviewCard: UICollectionViewCell {
         webpagePreviewRegionView.addSubview(webpagePreviewShadowView)
         webpagePreviewRegionView.addSubview(webpagePreviewClippingView)
         webpagePreviewClippingView.addSubview(webpagePreviewImageView)
+        webpagePreviewClippingView.addSubview(closeTabButton)
         contentView.addSubview(tabMetadataContainerView)
-        addSubview(closeTabButton)
         tabMetadataContainerView.addSubview(tabMetadataStackView)
         tabMetadataStackView.addArrangedSubview(faviconImageView)
         tabMetadataStackView.addArrangedSubview(tabTitleLabel)
@@ -330,8 +316,8 @@ final class TabOverviewCard: UICollectionViewCell {
             webpagePreviewImageView.leadingAnchor.constraint(equalTo: webpagePreviewClippingView.leadingAnchor),
             webpagePreviewImageView.trailingAnchor.constraint(equalTo: webpagePreviewClippingView.trailingAnchor),
             webpagePreviewImageView.bottomAnchor.constraint(equalTo: webpagePreviewClippingView.bottomAnchor),
-            closeTabButton.topAnchor.constraint(equalTo: webpagePreviewClippingView.topAnchor, constant: UX.closeButtonTopInset),
-            closeTabButton.trailingAnchor.constraint(equalTo: webpagePreviewClippingView.trailingAnchor, constant: -UX.closeButtonTrailingInset),
+            closeTabButton.topAnchor.constraint(equalTo: webpagePreviewImageView.topAnchor, constant: UX.closeButtonTopInset),
+            closeTabButton.trailingAnchor.constraint(equalTo: webpagePreviewImageView.trailingAnchor, constant: -UX.closeButtonTrailingInset),
             closeTabButton.widthAnchor.constraint(equalToConstant: UX.closeButtonSideLength),
             closeTabButton.heightAnchor.constraint(equalToConstant: UX.closeButtonSideLength),
             tabMetadataContainerView.topAnchor.constraint(equalTo: webpagePreviewRegionView.bottomAnchor, constant: UX.tabMetadataTopSpacing),
@@ -440,7 +426,20 @@ final class TabOverviewCard: UICollectionViewCell {
                     || velocity.x < -Self.swipeCloseVelocityThreshold)
             if shouldClose {
                 swipeFeedback.impactOccurred()
-                onClose?()
+                let exitOffset = -(bounds.width + 32)
+                swipeAnimator = UIViewPropertyAnimator(
+                    duration: 0.25,
+                    controlPoint1: CGPoint(x: 0.4, y: 0),
+                    controlPoint2: CGPoint(x: 1, y: 1)
+                )
+                swipeAnimator?.addAnimations { [weak self] in
+                    self?.transform = CGAffineTransform(translationX: exitOffset, y: 0)
+                    self?.alpha = 0
+                }
+                swipeAnimator?.addCompletion { [weak self] _ in
+                    self?.onClose?()
+                }
+                swipeAnimator?.startAnimation()
             } else {
                 UIView.animate(
                     withDuration: 0.32,

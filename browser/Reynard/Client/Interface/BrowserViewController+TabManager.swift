@@ -164,29 +164,11 @@ extension BrowserViewController {
     func captureThumbnailForVisibleTab(at index: Int) {
         guard !contentView.isHidden,
               let tab = tabManager.activeTabs[safe: index],
-              contentView.isDisplaying(session: tab.session) else {
+              contentView.isDisplaying(session: tab.session),
+              let image = contentView.makeThumbnail() else {
             return
         }
-
-        guard tab.hasThumbnailContent else {
-            tabManager.updateThumbnail(nil, forTabWithID: tab.id)
-            return
-        }
-
-        guard let image = contentView.makeThumbnail() else {
-            return
-        }
-
-        tabManager.updateThumbnail(image, forTabWithID: tab.id)
-    }
-}
-
-private extension Tab {
-    var hasThumbnailContent: Bool {
-        guard let value = url?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !value.isEmpty else {
-            return false
-        }
-        return value.lowercased() != "about:blank"
+        
+        tabManager.updateThumbnail(image, forTabAt: index)
     }
 }

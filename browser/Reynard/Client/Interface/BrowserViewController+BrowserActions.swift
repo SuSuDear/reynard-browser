@@ -69,8 +69,6 @@ extension BrowserViewController {
                     mode: mode.tabMode
                 )
                 self.tabBar.setPendingExpansion(at: newTabIndex)
-                self.tabOverview.prepareDismissSelection(to: newTabIndex, mode: mode.tabMode, previewImage: nil, previewOnly: true)
-                self.setTabOverviewVisible(false, animated: true)
             }
         } else {
             let newTabIndex = tabManager.createTab(selecting: true)
