@@ -187,6 +187,8 @@ final class TabOverviewCard: UICollectionViewCell {
         setReorderState(.resting, animated: false)
         swipeAnimator?.stopAnimation(true)
         swipeAnimator = nil
+        transform = .identity
+        alpha = 1
         webpagePreviewRegionView.transform = .identity
         webpagePreviewRegionView.alpha = 1
     }
@@ -198,6 +200,8 @@ final class TabOverviewCard: UICollectionViewCell {
         webpagePreviewImageView.image = tab.thumbnail
         closeTabButton.isHidden = tab.thumbnail == nil
         faviconImageView.image = tab.favicon ?? Self.fallbackFaviconImage
+        setNeedsLayout()
+        layoutIfNeeded()
     }
 
     var previewImage: UIImage? {
@@ -435,20 +439,9 @@ final class TabOverviewCard: UICollectionViewCell {
                     || velocity.x < -Self.swipeCloseVelocityThreshold)
             if shouldClose {
                 swipeFeedback.impactOccurred()
-                let exitOffset = -(bounds.width + 32)
-                swipeAnimator = UIViewPropertyAnimator(
-                    duration: 0.25,
-                    controlPoint1: CGPoint(x: 0.4, y: 0),
-                    controlPoint2: CGPoint(x: 1, y: 1)
-                )
-                swipeAnimator?.addAnimations { [weak self] in
-                    self?.transform = CGAffineTransform(translationX: exitOffset, y: 0)
-                    self?.alpha = 0
-                }
-                swipeAnimator?.addCompletion { [weak self] _ in
-                    self?.onClose?()
-                }
-                swipeAnimator?.startAnimation()
+                transform = .identity
+                alpha = 1
+                onClose?()
             } else {
                 UIView.animate(
                     withDuration: 0.32,
