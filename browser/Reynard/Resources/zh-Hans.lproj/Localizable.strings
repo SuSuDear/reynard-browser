@@ -166,6 +166,7 @@
 "addons.unsupported_status" = "不支持";
 "addons.loading" = "正在加载扩展...";
 "addons.none_installed" = "未安装扩展";
+"addons.allow_unsigned_extensions" = "允许未签名扩展";
 "addons.discover" = "发现扩展...";
 "addons.install_from_file" = "从文件安装扩展...";
 "addons.installing" = "正在安装扩展...";

@@ -34,6 +34,7 @@ final class AddonsPreferencesViewController: SettingsTableViewController {
     }
     
     private enum MoreRow: CaseIterable {
+        case allowUnsignedExtensions
         case discover
         case installFromFile
         case updateAll
@@ -76,7 +77,7 @@ final class AddonsPreferencesViewController: SettingsTableViewController {
     }
     
     private var displayedMoreRows: [MoreRow] {
-        return canCheckForAddonUpdates ? MoreRow.allCases : [.discover, .installFromFile]
+        return canCheckForAddonUpdates ? MoreRow.allCases : [.allowUnsignedExtensions, .discover, .installFromFile]
     }
     
     private var addonUpdateActionTitle: String {
@@ -192,6 +193,13 @@ final class AddonsPreferencesViewController: SettingsTableViewController {
             }
             let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
             switch displayedMoreRows[indexPath.row] {
+            case .allowUnsignedExtensions:
+                cell.textLabel?.text = L10n.string("addons.allow_unsigned_extensions")
+                let switchView = UISwitch()
+                switchView.isOn = BrowserPreferences.AddonSettings.allowUnsignedExtensions
+                switchView.addTarget(self, action: #selector(allowUnsignedExtensionsSwitchChanged(_:)), for: .valueChanged)
+                cell.accessoryView = switchView
+                cell.selectionStyle = .none
             case .discover:
                 cell.textLabel?.text = L10n.string("addons.discover")
                 cell.textLabel?.textColor = view.tintColor
@@ -236,6 +244,8 @@ final class AddonsPreferencesViewController: SettingsTableViewController {
                 return
             }
             switch displayedMoreRows[indexPath.row] {
+            case .allowUnsignedExtensions:
+                break
             case .discover:
                 LibrarySharedUtils.openLinkInBrowser("https://addons.mozilla.org/android/", from: self)
             case .installFromFile:
@@ -373,6 +383,10 @@ final class AddonsPreferencesViewController: SettingsTableViewController {
         present(picker, animated: true)
     }
     
+    @objc private func allowUnsignedExtensionsSwitchChanged(_ sender: UISwitch) {
+        BrowserPreferences.AddonSettings.allowUnsignedExtensions = sender.isOn
+    }
+
     private func installAddonPackage(from packageURL: URL) {
         isInstallingAddonFromFile = true
         reloadActionSection()
@@ -384,7 +398,10 @@ final class AddonsPreferencesViewController: SettingsTableViewController {
             
             do {
                 let stagedPackageURL = try Self.stageAddonPackage(from: packageURL)
-                _ = try await AddonRuntime.shared.install(url: stagedPackageURL.absoluteString)
+                _ = try await AddonRuntime.shared.install(
+                    url: stagedPackageURL.absoluteString,
+                    allowUnsignedExtensions: BrowserPreferences.AddonSettings.allowUnsignedExtensions
+                )
                 await self.loadRuntimeAddons()
                 
                 await MainActor.run {

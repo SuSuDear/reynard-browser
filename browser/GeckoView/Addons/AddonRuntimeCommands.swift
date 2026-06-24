@@ -40,7 +40,8 @@ public extension AddonRuntime {
         return upsertAddon(from: addonPayload)
     }
     
-    func install(url: String, installMethod: AddonInstallMethod? = nil) async throws -> Addon {
+    func install(url: String, installMethod: AddonInstallMethod? = nil, allowUnsignedExtensions: Bool = false) async throws -> Addon {
+        try await setUnsignedExtensionInstallAllowed(allowUnsignedExtensions)
         installCounter += 1
         let response = try await GeckoEventDispatcherWrapper.runtimeInstance.query(
             type: "GeckoView:WebExtension:Install",
@@ -139,6 +140,16 @@ public extension AddonRuntime {
 }
 
 extension AddonRuntime {
+    func setUnsignedExtensionInstallAllowed(_ allowed: Bool) async throws {
+        _ = try await GeckoEventDispatcherWrapper.runtimeInstance.query(
+            type: "GeckoView:Preferences:SetPref",
+            message: [
+                "name": "xpinstall.signatures.required",
+                "value": !allowed,
+            ]
+        )
+    }
+
     func mutateAddon(type: String, message: [String: Any?]) async throws -> Addon {
         let response = try await GeckoEventDispatcherWrapper.runtimeInstance.query(type: type, message: message)
         guard let payload = response as? [String: Any?],

@@ -363,6 +363,15 @@ final class BrowserPreferences {
                 prefs.set(data, forSetting: "AddonSettings", key: "pendingApprovalAddonIDs")
             }
         }
+
+        static var allowUnsignedExtensions: Bool {
+            get {
+                prefs.bool(forSetting: "AddonSettings", key: "allowUnsignedExtensions") ?? false
+            }
+            set {
+                prefs.set(newValue, forSetting: "AddonSettings", key: "allowUnsignedExtensions")
+            }
+        }
     }
 }
 
