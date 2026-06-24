@@ -741,12 +741,12 @@ final class TabManagerImplementation: NSObject, TabManager {
         return url
     }
     
-    func updateThumbnail(_ image: UIImage?, forTabAt index: Int) {
-        guard tabs(for: selectedTabMode).indices.contains(index) else {
+    func updateThumbnail(_ image: UIImage?, forTabWithID tabID: UUID) {
+        guard let location = tabLocation(for: tabID) else {
             return
         }
         
-        let tab = tabs(for: selectedTabMode)[index]
+        let tab = tabs(for: location.mode)[location.index]
         tab.thumbnail = image
         store.persistThumbnail(image, for: tab.id)
     }

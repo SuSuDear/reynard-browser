@@ -69,6 +69,7 @@ extension BrowserViewController {
                     mode: mode.tabMode
                 )
                 self.tabBar.setPendingExpansion(at: newTabIndex)
+                self.tabOverview.prepareDismissSelection(to: newTabIndex, mode: mode.tabMode, previewImage: nil)
                 self.setTabOverviewVisible(false, animated: true)
             }
         } else {
