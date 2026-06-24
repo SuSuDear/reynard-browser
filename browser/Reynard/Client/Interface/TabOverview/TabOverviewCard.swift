@@ -210,7 +210,10 @@ final class TabOverviewCard: UICollectionViewCell {
     }
 
     func makeWebpagePreviewRegionSnapshot() -> UIView? {
-        webpagePreviewRegionView.snapshotView(afterScreenUpdates: false)
+        let wasCloseButtonHidden = closeTabButton.isHidden
+        closeTabButton.isHidden = true
+        defer { closeTabButton.isHidden = wasCloseButtonHidden }
+        return webpagePreviewRegionView.snapshotView(afterScreenUpdates: false)
     }
 
     func transitionSnapshotFrame(in targetView: UIView) -> CGRect {
