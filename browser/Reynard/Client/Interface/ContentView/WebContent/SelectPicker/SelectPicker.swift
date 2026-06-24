@@ -67,7 +67,45 @@ final class SelectPicker {
             return
         }
         
-        showSingleSelectFallback(in: geckoView)
+        guard #available(iOS 14.0, *) else {
+            showSingleSelectFallback(in: geckoView)
+            return
+        }
+        
+        let button = SelectPickerMenuAnchorButton(frame: sourceRect)
+        button.backgroundColor = .clear
+        
+        let menuElements = buildMenuElements(from: choices)
+        button.menu = UIMenu(children: menuElements)
+        button.showsMenuAsPrimaryAction = true
+        
+        button.onMenuDismissed = { [weak self] in
+            self?.handleMenuDismissed()
+        }
+        
+        geckoView.addSubview(button)
+        anchorButton = button
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let button = self?.anchorButton else { return }
+            let interaction = button.interactions.compactMap { $0 as? UIContextMenuInteraction }.first
+            guard let interaction = interaction else {
+                self?.handleMenuDismissed()
+                return
+            }
+            
+            // Ugh we have to use private API here
+            let presentMenuSelector = NSSelectorFromString("_presentMenuAtLocation:")
+            if interaction.responds(to: presentMenuSelector) {
+                let center = CGPoint(x: button.bounds.midX, y: button.bounds.midY)
+                let implementation = interaction.method(for: presentMenuSelector)
+                typealias PresentMenu = @convention(c) (AnyObject, Selector, CGPoint) -> Void
+                let presentMenu = unsafeBitCast(implementation, to: PresentMenu.self)
+                presentMenu(interaction, presentMenuSelector, center)
+            } else {
+                self?.handleMenuDismissed()
+            }
+        }
     }
     
     private func showSingleSelectFallback(in geckoView: UIView) {
