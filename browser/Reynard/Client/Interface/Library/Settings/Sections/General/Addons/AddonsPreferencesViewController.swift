@@ -400,6 +400,7 @@ final class AddonsPreferencesViewController: SettingsTableViewController {
                 let stagedPackageURL = try Self.stageAddonPackage(from: packageURL)
                 _ = try await AddonRuntime.shared.install(
                     url: stagedPackageURL.absoluteString,
+                    installMethod: .manager,
                     allowUnsignedExtensions: BrowserPreferences.AddonSettings.allowUnsignedExtensions
                 )
                 await self.loadRuntimeAddons()
