@@ -17,16 +17,16 @@ extension TabOverviewCollection: UICollectionViewDataSource, UICollectionViewDel
         }
         return tabCount + (includesInsertionPlaceholder ? 1 : 0)
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, canMoveItemAt indexPath: IndexPath) -> Bool {
         !isInsertionPlaceholder(in: collectionView, at: indexPath)
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if isInsertionPlaceholder(in: collectionView, at: indexPath) {
             return insertionPlaceholderCell(in: collectionView, at: indexPath)
         }
-
+        
         guard let tabMode = tabMode(for: collectionView),
               tabs(for: tabMode).indices.contains(indexPath.item),
               let tabCard = collectionView.dequeueReusableCell(
@@ -35,7 +35,7 @@ extension TabOverviewCollection: UICollectionViewDataSource, UICollectionViewDel
               ) as? TabOverviewCard else {
             return UICollectionViewCell()
         }
-
+        
         tabCard.isHidden = false
         tabCard.configure(with: tabs(for: tabMode)[indexPath.item])
         tabCard.onClose = { [weak self, weak collectionView, weak tabCard] in
@@ -52,7 +52,7 @@ extension TabOverviewCollection: UICollectionViewDataSource, UICollectionViewDel
         }
         return tabCard
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let tabMode = tabMode(for: collectionView),
               tabs(for: tabMode).indices.contains(indexPath.item),
@@ -66,7 +66,7 @@ extension TabOverviewCollection: UICollectionViewDataSource, UICollectionViewDel
         tabOverview.reloadTabs()
         tabOverview.delegate?.tabOverviewDidRequestDismiss(tabOverview, animated: true)
     }
-
+    
     func collectionView(
         _ collectionView: UICollectionView,
         moveItemAt sourceIndexPath: IndexPath,
@@ -79,7 +79,7 @@ extension TabOverviewCollection: UICollectionViewDataSource, UICollectionViewDel
             mode: tabMode.tabMode
         )
     }
-
+    
     func collectionView(
         _ collectionView: UICollectionView,
         willDisplay cell: UICollectionViewCell,
@@ -89,7 +89,7 @@ extension TabOverviewCollection: UICollectionViewDataSource, UICollectionViewDel
         cell.setNeedsLayout()
         cell.layoutIfNeeded()
     }
-
+    
     func collectionView(
         _ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
@@ -97,26 +97,7 @@ extension TabOverviewCollection: UICollectionViewDataSource, UICollectionViewDel
     ) -> CGSize {
         tabOverview?.presentation.cardSize(in: collectionView) ?? .zero
     }
-
-    func collectionView(
-        _ collectionView: UICollectionView,
-        layout collectionViewLayout: UICollectionViewLayout,
-        insetForSectionAt section: Int
-    ) -> UIEdgeInsets {
-        guard let tabMode = tabMode(for: collectionView),
-              tabs(for: tabMode).count == 1,
-              let tabOverview else {
-            return .zero
-        }
-        let cardSize = tabOverview.presentation.cardSize(in: collectionView)
-        let adjustedInset = collectionView.adjustedContentInset
-        let availableWidth = collectionView.bounds.width - adjustedInset.left - adjustedInset.right
-        let availableHeight = collectionView.bounds.height - adjustedInset.top - adjustedInset.bottom
-        let horizontalInset = max(0, floor((availableWidth - cardSize.width) / 2))
-        let verticalInset = max(0, floor((availableHeight - cardSize.height) / 2))
-        return UIEdgeInsets(top: verticalInset, left: horizontalInset, bottom: verticalInset, right: horizontalInset)
-    }
-
+    
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         guard let longPressGesture = gestureRecognizer as? UILongPressGestureRecognizer,
               let collectionView = longPressGesture.view as? UICollectionView,
@@ -127,7 +108,7 @@ extension TabOverviewCollection: UICollectionViewDataSource, UICollectionViewDel
         let locationInCard = collectionView.convert(longPressGesture.location(in: collectionView), to: tabCard)
         return !tabCard.isCloseButton(at: locationInCard)
     }
-
+    
     private func insertionPlaceholderCell(
         in collectionView: UICollectionView,
         at indexPath: IndexPath

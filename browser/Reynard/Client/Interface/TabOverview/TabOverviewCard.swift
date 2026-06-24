@@ -187,8 +187,8 @@ final class TabOverviewCard: UICollectionViewCell {
         setReorderState(.resting, animated: false)
         swipeAnimator?.stopAnimation(true)
         swipeAnimator = nil
-        contentView.transform = .identity
-        contentView.alpha = 1
+        webpagePreviewRegionView.transform = .identity
+        webpagePreviewRegionView.alpha = 1
     }
 
     // MARK: - Content
@@ -416,9 +416,9 @@ final class TabOverviewCard: UICollectionViewCell {
         case .changed:
             let dx = translation.x
             let absorbed = dx <= 0 ? dx : dx * 0.35
-            contentView.transform = CGAffineTransform(translationX: absorbed, y: 0)
+            webpagePreviewRegionView.transform = CGAffineTransform(translationX: absorbed, y: 0)
             let progress = max(0, min(1, abs(absorbed) / 160))
-            contentView.alpha = 1 - 0.6 * progress
+            webpagePreviewRegionView.alpha = 1 - 0.6 * progress
         case .ended, .cancelled:
             let shouldClose = gesture.state != .cancelled
                 && translation.x < 0
@@ -433,8 +433,8 @@ final class TabOverviewCard: UICollectionViewCell {
                     controlPoint2: CGPoint(x: 1, y: 1)
                 )
                 swipeAnimator?.addAnimations { [weak self] in
-                    self?.contentView.transform = CGAffineTransform(translationX: exitOffset, y: 0)
-                    self?.contentView.alpha = 0
+                    self?.webpagePreviewRegionView.transform = CGAffineTransform(translationX: exitOffset, y: 0)
+                    self?.webpagePreviewRegionView.alpha = 0
                 }
                 swipeAnimator?.addCompletion { [weak self] _ in
                     self?.onClose?()
@@ -448,8 +448,8 @@ final class TabOverviewCard: UICollectionViewCell {
                     initialSpringVelocity: 0.4,
                     options: [.beginFromCurrentState, .allowUserInteraction]
                 ) { [weak self] in
-                    self?.contentView.transform = .identity
-                    self?.contentView.alpha = 1
+                    self?.webpagePreviewRegionView.transform = .identity
+                    self?.webpagePreviewRegionView.alpha = 1
                 }
             }
         default:
