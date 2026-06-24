@@ -241,13 +241,10 @@ final class TabOverviewCard: UICollectionViewCell {
         rendererFormat.scale = UIScreen.main.scale
         rendererFormat.opaque = false
         let renderer = UIGraphicsImageRenderer(size: snapshotBounds.size, format: rendererFormat)
-        let wasCloseButtonHidden = closeTabButton.isHidden
-        closeTabButton.isHidden = true
         let snapshotImage = renderer.image { context in
             context.cgContext.translateBy(x: UX.cardTransitionSnapshotOutset, y: UX.cardTransitionSnapshotOutset)
             contentView.layer.render(in: context.cgContext)
         }
-        closeTabButton.isHidden = wasCloseButtonHidden
 
         let snapshotImageView = UIImageView(image: snapshotImage)
         snapshotImageView.contentMode = .scaleToFill
@@ -349,7 +346,7 @@ final class TabOverviewCard: UICollectionViewCell {
         let pan = UIPanGestureRecognizer(target: self, action: #selector(handleSwipeToClose(_:)))
         pan.delegate = swipeGestureDelegate
         pan.maximumNumberOfTouches = 1
-        contentView.addGestureRecognizer(pan)
+        webpagePreviewRegionView.addGestureRecognizer(pan)
         swipePanGesture = pan
     }
 
@@ -409,8 +406,8 @@ final class TabOverviewCard: UICollectionViewCell {
     }
 
     @objc private func handleSwipeToClose(_ gesture: UIPanGestureRecognizer) {
-        let translation = gesture.translation(in: contentView)
-        let velocity = gesture.velocity(in: contentView)
+        let translation = gesture.translation(in: webpagePreviewRegionView)
+        let velocity = gesture.velocity(in: webpagePreviewRegionView)
 
         switch gesture.state {
         case .began:
@@ -478,7 +475,7 @@ extension TabOverviewCard {
                   pan === owner.swipePanGesture else {
                 return true
             }
-            let velocity = pan.velocity(in: owner.contentView)
+            let velocity = pan.velocity(in: owner.webpagePreviewRegionView)
             return abs(velocity.x) > abs(velocity.y) && abs(velocity.x) > 80
         }
 
