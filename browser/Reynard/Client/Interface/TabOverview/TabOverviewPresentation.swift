@@ -188,6 +188,7 @@ final class TabOverviewPresentation {
         tabOverview.setMode(overviewMode, animated: false)
         let selectedIndex = dataSource.selectedIndex
         context.containerView.layoutIfNeeded()
+        tabOverview.updatePreviewContentSize(context.contentView.frame.size)
         dataSource.captureThumbnailForVisibleTab(at: selectedIndex)
         let bottomSnapshot = context.browserChrome.bottomToolbarSnapshot()
         context.updateLayout(animated: false, duration: 0)
@@ -362,6 +363,7 @@ final class TabOverviewPresentation {
         tabOverview.setMode(overviewMode, animated: false)
         let selectedIndex = dataSource.selectedIndex
         context.containerView.layoutIfNeeded()
+        tabOverview.updatePreviewContentSize(context.contentView.frame.size)
         dataSource.captureThumbnailForVisibleTab(at: selectedIndex)
         context.updateLayout(animated: false, duration: 0)
         tabOverview.invalidateCollectionLayouts()

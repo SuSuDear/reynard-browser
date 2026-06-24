@@ -85,6 +85,10 @@ final class TabOverview: UIView {
     }
     
     var previewContentSize: CGSize {
+        if let cachedPreviewContentSize = cachedPreviewContentSize {
+            return cachedPreviewContentSize
+        }
+
         guard let contentView = presentationContext?.contentView else {
             return CGSize(width: 1, height: 1)
         }
@@ -97,7 +101,9 @@ final class TabOverview: UIView {
         let boundsSize = contentView.bounds.size
         return CGSize(width: max(boundsSize.width, 1), height: max(boundsSize.height, 1))
     }
-    
+
+    private var cachedPreviewContentSize: CGSize?
+
     let collection: TabOverviewCollection
     let topToolbar = TabOverviewTopToolbar()
     let bottomToolbar = TabOverviewBottomToolbar()
@@ -219,6 +225,13 @@ final class TabOverview: UIView {
         collection.invalidateCardLayouts()
     }
     
+    func updatePreviewContentSize(_ size: CGSize) {
+        guard size.width > 1, size.height > 1 else {
+            return
+        }
+        cachedPreviewContentSize = size
+    }
+
     // MARK: - Presentation Access
     
     func currentCollectionView() -> UICollectionView {
