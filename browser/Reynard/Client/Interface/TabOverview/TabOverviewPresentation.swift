@@ -12,7 +12,7 @@ final class TabOverviewPresentation {
         static let cardCollectionItemSpacing: CGFloat = 16
         static let cardMinimumPreviewAspectRatio: CGFloat = 0.4
         static let phoneCardTargetWidth: CGFloat = 170
-        static let phoneSingleCardWidthRatio: CGFloat = 0.64
+        static let phoneSingleCardWidthRatio: CGFloat = 0.35
         static let padCardTargetWidth: CGFloat = 250
         static let minimumTabCardColumnCount = 2
         static let cardMetadataHeight: CGFloat = 22
@@ -343,7 +343,6 @@ final class TabOverviewPresentation {
             for collectionView in self.tabOverview.collection.allCollectionViews {
                 collectionView.alpha = 0
             }
-            selectedCollection.transform = standardCollectionTransform.scaledBy(x: UX.transitionCollectionInitialScale, y: UX.transitionCollectionInitialScale)
             self.context.browserChrome.setChromeTransition(topAlpha: 1, bottomAlpha: 1, bottomTranslationY: 0)
         } completion: { _ in
             pageSnapshot.removeFromSuperview()
