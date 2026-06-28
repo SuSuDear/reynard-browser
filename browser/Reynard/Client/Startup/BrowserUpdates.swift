@@ -15,13 +15,13 @@ final class BrowserUpdates: NSObject {
     private(set) var sourceData: Data?
     var cachedReleaseNotes: NSAttributedString?
     
-    private static let sourceURL = "https://github.com/minh-ton/reynard-browser/releases/download/0.0.1-a1/source.json"
+    private static let sourceURL = "https://github.com/SuSuDear/reynard-browser/releases/download/source/source.json"
     private override init() {
         super.init()
         
         guard let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
-        let sideloadIPA = docs.appendingPathComponent("Reynard.ipa")
-        try? FileManager.default.removeItem(at: sideloadIPA)
+        let trollStoreTIPA = docs.appendingPathComponent("Reynard-TrollStore.tipa")
+        try? FileManager.default.removeItem(at: trollStoreTIPA)
         
         fetchUpdates()
     }

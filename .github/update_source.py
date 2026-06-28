@@ -55,9 +55,9 @@ def build_versions(api_root: str, asset_name: str, releases: list[dict]) -> list
 	return versions
 
 def main() -> None:
-	api_root = "https://api.github.com/repos/minh-ton/reynard-browser"
+	api_root = "https://api.github.com/repos/SuSuDear/reynard-browser"
 	source_path = Path(__file__).with_name("source.json")
-	asset_name = "Reynard.ipa"
+	asset_name = "Reynard-TrollStore.tipa"
 
 	source_data = json.loads(source_path.read_text(encoding="utf-8"))
 	source_data["apps"][0]["versions"] = build_versions(api_root, asset_name, gh_request(f"{api_root}/releases"))

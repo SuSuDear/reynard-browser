@@ -118,34 +118,19 @@ final class UpdatesSettingsSection {
               let appEntry = appEntries.first,
               let versions = appEntry["versions"] as? [[String: Any]],
               let latestEntry = versions.first,
-              let packageURLString = latestEntry["downloadURL"] as? String,
-              let packageURL = URL(string: packageURLString) else {
+              let packageURLString = latestEntry["downloadURL"] as? String else {
             AlertPresenter.show(title: L10n.string("updates.unavailable_title"), message: L10n.string("updates.unavailable_message"))
             return
         }
 
-        let expectedSize = latestEntry["size"] as? Int
-        if installedThroughTrollStore {
-            let trollStorePackageURLString = packageURLString.replacingOccurrences(
-                of: "Reynard.ipa",
-                with: "Reynard-TrollStore.tipa"
-            )
-            let encodedPackageURLString = trollStorePackageURLString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ??
-            trollStorePackageURLString
+        let encodedPackageURLString = packageURLString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ??
+            packageURLString
 
-            if let schemeURL = URL(string: "apple-magnifier://install?url=" + encodedPackageURLString),
-               UIApplication.shared.canOpenURL(schemeURL) {
-                UIApplication.shared.open(schemeURL)
-                return
-            }
+        if let schemeURL = URL(string: "apple-magnifier://install?url=" + encodedPackageURLString),
+           UIApplication.shared.canOpenURL(schemeURL) {
+            UIApplication.shared.open(schemeURL)
         } else {
-            downloadUpdate(
-                from: packageURL,
-                fileName: "Reynard.ipa",
-                expectedSize: expectedSize,
-                message: L10n.string("updates.sideload_install_message"),
-                viewController: viewController
-            )
+            AlertPresenter.show(title: L10n.string("updates.unavailable_title"), message: L10n.string("updates.unavailable_message"))
         }
     }
 

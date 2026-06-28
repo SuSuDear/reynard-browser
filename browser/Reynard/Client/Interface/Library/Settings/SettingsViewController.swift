@@ -38,8 +38,7 @@ final class SettingsViewController: SettingsTableViewController {
     private let aboutSection = AboutSettingsSection()
     
     private var allowUpdate: Bool {
-        let unsandboxed = getEntitlementValue("com.apple.private.security.no-sandbox")
-        return !unsandboxed || updatesSection.installedThroughTrollStore
+        return updatesSection.installedThroughTrollStore
     }
     
     var displayedSections: [Section] {
