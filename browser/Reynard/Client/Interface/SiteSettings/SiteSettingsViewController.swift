@@ -161,8 +161,6 @@ final class SiteSettingsViewController: UITableViewController {
             return "Media"
         case .permissions:
             return L10n.string("permissions.title")
-        case .siteActions:
-            return L10n.string("permissions.actions")
         }
     }
 
@@ -269,7 +267,7 @@ final class SiteSettingsViewController: UITableViewController {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
         cell.textLabel?.text = L10n.string("permissions.reset_this_site")
         cell.textLabel?.textColor = .systemRed
-        cell.detailTextLabel?.text = didResetSitePermissions ? L10n.string("permissions.reset_this_site_success") : nil
+        cell.detailTextLabel?.text = nil
         cell.detailTextLabel?.textColor = .secondaryLabel
         cell.accessoryView = nil
         cell.accessoryType = .none
