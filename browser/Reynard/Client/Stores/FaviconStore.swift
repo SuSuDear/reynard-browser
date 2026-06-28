@@ -148,6 +148,29 @@ final class FaviconStore {
         return await task.value
     }
     
+    func clearCache() {
+        stateQueue.async {
+            self.activeRequests.values.forEach { $0.cancel() }
+            self.activeRequests.removeAll()
+            
+            let imageKeys = self.fetchImageKeysLocked()
+            _ = self.executeLocked(
+                """
+                DELETE FROM favicon_associations;
+                DELETE FROM favicon_sources;
+                DELETE FROM favicon_images;
+                """
+            )
+            
+            for imageKey in imageKeys {
+                let imageURL = self.imageFileURL(for: imageKey)
+                if self.fileManager.fileExists(atPath: imageURL.path) {
+                    try? self.fileManager.removeItem(at: imageURL)
+                }
+            }
+        }
+    }
+    
     // MARK: - Storage
     
     private func prepareStorageLocked() {
@@ -822,7 +845,7 @@ final class FaviconStore {
     
     private func string(from data: Data, response: URLResponse) -> String {
         if let encodingName = response.textEncodingName,
-           let encoding = String.Encoding(ianaCharsetName: encodingName),
+           let encoding = String.Encoding.ianaCharacterSetName(encodingName),
            let string = String(data: data, encoding: encoding) {
             return string
         }
@@ -890,16 +913,5 @@ final class FaviconStore {
     
     private static func sha256(_ data: Data) -> String {
         SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
-    }
-}
-
-private extension String.Encoding {
-    init?(ianaCharsetName: String) {
-        let cfEncoding = CFStringConvertIANACharSetNameToEncoding(ianaCharsetName as CFString)
-        guard cfEncoding != kCFStringEncodingInvalidId else {
-            return nil
-        }
-        
-        self.init(rawValue: CFStringConvertEncodingToNSStringEncoding(cfEncoding))
     }
 }

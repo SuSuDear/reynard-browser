@@ -201,7 +201,7 @@ final class SearchViewController: UIViewController, UITableViewDataSource, UITab
         case .primarySuggestion:
             return results.bestMatch == nil ? nil : bestMatchSpacerView
         case .typedQuery:
-            return hasQuery ? completionsHeaderView : nil
+            return hasQuery ? makeSectionHeaderView(title: "\(viewModel.searchSuggestionProvider.name) Suggestions") : nil
         case .completions:
             return nil
         case .userDataResults:

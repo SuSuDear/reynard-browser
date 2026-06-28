@@ -23,10 +23,28 @@ extension BrowserViewController: TabBarDataSource, TabOverviewDataSource, TabOve
     }
     
     func selectTab(at index: Int, mode: TabMode) {
+        if mode == tabManager.selectedTabMode,
+           index != tabManager.selectedTabIndex {
+            captureThumbnail(forTabAt: tabManager.selectedTabIndex, mode: tabManager.selectedTabMode) { [weak self] _ in
+                self?.tabManager.selectTab(at: index, mode: mode)
+            }
+            return
+        }
         tabManager.selectTab(at: index, mode: mode)
     }
     
     func closeTab(at index: Int, mode: TabMode) {
+        if tabOverview.isPresented,
+           tabOverview.mode == .regularTabs,
+           mode == .regular,
+           tabManager.regularTabs.count == 1 {
+            tabOverview.prepareNextTabChangesWithoutAnimation()
+            tabManager.removeTab(at: index, mode: mode)
+            tabOverview.prepareNextTabChangesWithoutAnimation()
+            createTabFromOverview(mode: .regular)
+            return
+        }
+        
         tabManager.removeTab(at: index, mode: mode)
     }
     
@@ -90,10 +108,15 @@ extension BrowserViewController: TabBarDataSource, TabOverviewDataSource, TabOve
     
     func setTabOverviewVisible(_ visible: Bool, animated: Bool) {
         if visible {
+            dismissAddressBarEditingAndOverlays()
             contentView.resetFocusedInputRelocation()
+            homepageOverlayCoordinator.tabOverviewWillPresent()
             searchOverlayCoordinator.tabOverviewWillPresent()
         }
         tabOverview.setPresented(visible, animated: animated)
+        if !visible {
+            homepageOverlayCoordinator.updatePresentation(animated: animated)
+        }
     }
     
     // MARK: - Tab Overview Actions
@@ -116,6 +139,20 @@ extension BrowserViewController: TabBarDataSource, TabOverviewDataSource, TabOve
         setTabOverviewVisible(false, animated: true)
     }
     
+    func scrollTabOverviewToTab(at index: Int) {
+        guard let itemIndex = tabOverview.itemIndex(forTabAt: index) else {
+            return
+        }
+        
+        let collectionView = tabOverview.currentCollectionView()
+        collectionView.scrollToItem(
+            at: IndexPath(item: itemIndex, section: 0),
+            at: .centeredVertically,
+            animated: false
+        )
+        collectionView.layoutIfNeeded()
+    }
+    
     private func clearTabsForCurrentOverviewMode() {
         tabBar.setPendingExpansion(at: nil)
         
@@ -124,6 +161,50 @@ extension BrowserViewController: TabBarDataSource, TabOverviewDataSource, TabOve
             return
         }
         
-        tabManager.removeAllTabs(mode: tabOverview.mode.tabMode)
+        let mode = tabOverview.mode.tabMode
+        guard mode == .regular else {
+            tabManager.removeAllTabs(mode: mode)
+            return
+        }
+        
+        if !tabManager.regularTabs.isEmpty {
+            tabOverview.prepareNextTabChangesWithoutAnimation()
+        }
+        tabManager.removeAllTabs(mode: .regular)
+        tabOverview.prepareNextTabChangesWithoutAnimation()
+        createTabFromOverview(mode: .regular)
+    }
+    
+    func createTabFromOverview(mode: TabMode) {
+        homepageOverlayCoordinator.prepareHomepageForNewTab(mode: mode)
+        let createdIndex = tabManager.createTab(
+            selecting: true,
+            target: .end,
+            mode: mode
+        )
+        
+        switch Prefs.NewTabSettings.newTabDisplayOption {
+        case .homepage, .blankPage:
+            let createdTabs = mode == .private ? tabManager.privateTabs : tabManager.regularTabs
+            let createdTabID = createdTabs[createdIndex].id
+            
+            captureThumbnail(forTabAt: createdIndex, mode: mode) { [weak self] previewImage in
+                guard let self,
+                      (mode == .private ? self.tabManager.privateTabs : self.tabManager.regularTabs)[safe: createdIndex]?.id == createdTabID else {
+                    return
+                }
+                
+                self.tabOverview.prepareDismissSelection(to: createdIndex, mode: mode, previewImage: previewImage)
+                self.scrollTabOverviewToTab(at: createdIndex)
+                self.tabBar.setPendingExpansion(at: createdIndex)
+                self.setTabOverviewVisible(false, animated: true)
+            }
+        case .customURL:
+            applyNewTabDisplayOption(toTabAt: createdIndex)
+            tabOverview.prepareDismissSelection(to: createdIndex, mode: mode, previewImage: nil)
+            scrollTabOverviewToTab(at: createdIndex)
+            tabBar.setPendingExpansion(at: createdIndex)
+            setTabOverviewVisible(false, animated: true)
+        }
     }
 }

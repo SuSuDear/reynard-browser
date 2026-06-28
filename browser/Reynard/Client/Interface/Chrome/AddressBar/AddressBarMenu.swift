@@ -12,40 +12,40 @@ enum AddressBarMenu {
         static let addressBarMenu = UIMenu.Identifier("com.minh-ton.Reynard.AddressBarMenu")
         static let manageAddonsMenu = UIMenu.Identifier("com.minh-ton.Reynard.AddressBarMenu.ManageAddons")
     }
-    
+
     struct AddonItem {
         let menuItem: AddonMenuItem
         let image: UIImage?
     }
-    
+
     static func makeMenu(
         selectedURL: String?,
         usesDesktopWebsite: Bool?,
         addressBarPosition: BrowserChromePosition,
         addonItems: [AddonItem],
         onAddonSelected: @escaping (AddonMenuItem) -> Void,
+        onPageZoom: @escaping () -> Void,
         onChangeWebsiteMode: @escaping () -> Void,
         onChangeAddressBarPosition: @escaping (BrowserChromePosition) -> Void,
         onWebsiteSettings: @escaping () -> Void,
         onBookmark: @escaping (Bool) -> Void
     ) -> UIMenu {
         var tabActions: [UIMenuElement] = []
-        
+
         let url = selectedURL.flatMap(URL.init(string:))
-        if let url,
-           url.host != nil {
+        if let url, url.host != nil {
             let title = BookmarkStore.shared.bookmark(savedFor: url) == nil ? L10n.string("address_bar.add_bookmark") : L10n.string("address_bar.edit_bookmark")
             tabActions.append(UIAction(title: title, image: UIImage(named: "reynard.book")) { _ in
                 onBookmark(false)
             })
-            
+
             if !BookmarkStore.shared.isSavedInFavorites(url) {
                 tabActions.append(UIAction(title: L10n.string("address_bar.add_to_favorites"), image: UIImage(named: "reynard.star")) { _ in
                     onBookmark(true)
                 })
             }
         }
-        
+
         let addonsChildren: [UIMenuElement]
         if addonItems.isEmpty {
             addonsChildren = [
@@ -62,7 +62,7 @@ enum AddressBarMenu {
                 }
             }
         }
-        
+
         var pageActions: [UIMenuElement] = [
             UIMenu(
                 title: L10n.string("address_bar.manage_addons"),
@@ -71,7 +71,13 @@ enum AddressBarMenu {
                 children: addonsChildren
             )
         ]
-        
+
+        if url?.host != nil {
+            pageActions.append(UIAction(title: L10n.string("address_bar.page_zoom"), image: UIImage(named: "reynard.textformat.size")) { _ in
+                onPageZoom()
+            })
+        }
+
         if let isDesktop = usesDesktopWebsite {
             let title = isDesktop ? L10n.string("address_bar.request_mobile_website") : L10n.string("address_bar.request_desktop_website")
             let imageName = isDesktop ? "reynard.smartphone" : "reynard.desktopcomputer"
@@ -79,7 +85,7 @@ enum AddressBarMenu {
                 onChangeWebsiteMode()
             })
         }
-        
+
         var settingsActions: [UIMenuElement] = []
         let targetAddressBarPosition: BrowserChromePosition = addressBarPosition == .bottom ? .top : .bottom
         let addressBarPositionTitle = targetAddressBarPosition == .top
@@ -96,9 +102,9 @@ enum AddressBarMenu {
                 onWebsiteSettings()
             })
         }
-        
+
         let children = tabActions + [UIMenu(options: .displayInline, children: pageActions)] + [UIMenu(options: .displayInline, children: settingsActions)]
-        
+
         return UIMenu(title: "", image: nil, identifier: Identifier.addressBarMenu, options: [], children: children)
     }
 }

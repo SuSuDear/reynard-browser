@@ -10,13 +10,13 @@ import UIKit
 
 final class SiteSettingsViewController: UITableViewController {
     private let permissionCellReuseIdentifier = "Cell"
-    
+
     private enum Section {
         case availability
+        case media
         case permissions
-        case siteActions
     }
-    
+
     private enum Row: CaseIterable {
         case autoplay
         case camera
@@ -26,7 +26,7 @@ final class SiteSettingsViewController: UITableViewController {
         case crossOriginStorageAccess
         case localDeviceAccess
         case localNetworkAccess
-        
+
         var title: String {
             switch self {
             case .camera:
@@ -47,7 +47,7 @@ final class SiteSettingsViewController: UITableViewController {
                 return L10n.string("permissions.autoplay")
             }
         }
-        
+
         var permission: SitePermission {
             switch self {
             case .camera:
@@ -69,14 +69,16 @@ final class SiteSettingsViewController: UITableViewController {
             }
         }
     }
-    
+
     private enum LoadingState {
         case loading
         case loaded
     }
-    
-    private let permissionRows: [Row] = [
+
+    private let mediaRows: [Row] = [
         .autoplay,
+    ]
+    private let permissionRows: [Row] = [
         .camera,
         .microphone,
         .location,
@@ -90,37 +92,36 @@ final class SiteSettingsViewController: UITableViewController {
     private let session: GeckoSession
     private var loadState: LoadingState = .loading
     private var loadedGeckoPermissions: [ContentPermission] = []
-    private var didResetSitePermissions = false
-    
+
     private var visibleSections: [Section] {
         var sections: [Section] = []
-        
+
         if !SiteSettingsUtils.disabledPermissionNames().isEmpty {
             sections.append(.availability)
         }
-        
+
+        sections.append(.media)
         sections.append(.permissions)
-        sections.append(.siteActions)
         return sections
     }
-    
+
     init?(url: URL, session: GeckoSession) {
         guard let host = URLUtils.normalizedHost(url.host),
               let origin = URLUtils.httpOriginString(for: url) else {
             return nil
         }
-        
+
         self.host = host
         self.origin = origin
         self.session = session
         super.init(style: .insetGrouped)
         title = L10n.string("site_settings.title", host)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         configureView()
@@ -128,41 +129,43 @@ final class SiteSettingsViewController: UITableViewController {
             await self?.loadPermissionsFromGecko()
         }
     }
-    
+
     override func numberOfSections(in tableView: UITableView) -> Int {
         visibleSections.count
     }
-    
+
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         guard visibleSections.indices.contains(section) else {
             return 0
         }
-        
+
         switch visibleSections[section] {
         case .availability:
             return 2
+        case .media:
+            return loadState == .loaded ? mediaRows.count : 0
         case .permissions:
-            return loadState == .loaded ? permissionRows.count : 0
-        case .siteActions:
-            return loadState == .loaded ? 1 : 0
+            return loadState == .loaded ? permissionRows.count + 1 : 0
         }
     }
-    
+
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         guard visibleSections.indices.contains(section) else {
             return nil
         }
-        
+
         switch visibleSections[section] {
         case .availability:
             return nil
+        case .media:
+            return "Media"
         case .permissions:
             return L10n.string("permissions.title")
         case .siteActions:
             return L10n.string("permissions.actions")
         }
     }
-    
+
     override func tableView(
         _ tableView: UITableView,
         cellForRowAt indexPath: IndexPath
@@ -170,36 +173,43 @@ final class SiteSettingsViewController: UITableViewController {
         guard visibleSections.indices.contains(indexPath.section) else {
             return UITableViewCell()
         }
-        
+
         switch visibleSections[indexPath.section] {
         case .availability:
             return availabilityCell(at: indexPath)
-        case .permissions:
+        case .media:
             return permissionCell(at: indexPath)
-        case .siteActions:
-            return resetSitePermissionsCell()
+        case .permissions:
+            if indexPath.row == permissionRows.count {
+                return resetSitePermissionsCell()
+            }
+            return permissionCell(at: indexPath)
         }
     }
-    
+
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard visibleSections.indices.contains(indexPath.section) else {
             return
         }
-        
+
         switch visibleSections[indexPath.section] {
         case .availability:
             handleAvailabilitySelection(at: indexPath)
-        case .permissions:
+        case .media:
             handlePermissionSelection(at: indexPath)
-        case .siteActions:
-            resetSitePermissions()
+        case .permissions:
+            if indexPath.row == permissionRows.count {
+                confirmResetSitePermissions()
+            } else {
+                handlePermissionSelection(at: indexPath)
+            }
         }
-        
+
         tableView.deselectRow(at: indexPath, animated: true)
     }
-    
+
     // MARK: - Table Data
-    
+
     private func availabilityCell(at indexPath: IndexPath) -> UITableViewCell {
         if indexPath.row == 0 {
             let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
@@ -209,22 +219,22 @@ final class SiteSettingsViewController: UITableViewController {
             cell.selectionStyle = .none
             return cell
         }
-        
+
         let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
         cell.textLabel?.text = L10n.string("permissions.open_settings")
         cell.textLabel?.textColor = view.tintColor
         cell.accessoryType = .none
         return cell
     }
-    
+
     private func permissionCell(at indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: permissionCellReuseIdentifier)
         ?? UITableViewCell(style: .value1, reuseIdentifier: permissionCellReuseIdentifier)
-        
+
         guard let row = row(at: indexPath) else {
             return cell
         }
-        
+
         let titles = SiteSettingsUtils.actionTitles(for: row.permission)
         let selectedIndex = selectedOptionIndex(for: row)
         cell.textLabel?.text = row.title
@@ -238,11 +248,11 @@ final class SiteSettingsViewController: UITableViewController {
             cell.accessoryType = .none
             return cell
         }
-        
+
         cell.textLabel?.textColor = .label
         cell.selectionStyle = .default
         cell.isUserInteractionEnabled = true
-        
+
         if #available(iOS 14.0, *) {
             cell.detailTextLabel?.text = nil
             cell.accessoryView = permissionMenuButton(for: row)
@@ -254,7 +264,7 @@ final class SiteSettingsViewController: UITableViewController {
         }
         return cell
     }
-    
+
     private func resetSitePermissionsCell() -> UITableViewCell {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
         cell.textLabel?.text = L10n.string("permissions.reset_this_site")
@@ -266,44 +276,45 @@ final class SiteSettingsViewController: UITableViewController {
         cell.selectionStyle = .default
         return cell
     }
-    
+
     private func row(at indexPath: IndexPath) -> Row? {
         guard visibleSections.indices.contains(indexPath.section) else {
             return nil
         }
-        
+
         switch visibleSections[indexPath.section] {
+        case .media:
+            return mediaRows[safe: indexPath.row]
         case .permissions:
             return permissionRows[safe: indexPath.row]
-        case .siteActions,
-                .availability:
+        case .availability:
             return nil
         }
     }
-    
+
     // MARK: - Actions
-    
+
     private func handleAvailabilitySelection(at indexPath: IndexPath) {
         guard indexPath.row == 1 else {
             return
         }
-        
+
         SiteSettingsUtils.openAppSettings()
     }
-    
+
     private func handlePermissionSelection(at indexPath: IndexPath) {
         guard let row = row(at: indexPath),
               !SiteSettingsUtils.isSystemDisabled(row.permission) else {
             return
         }
-        
+
         if #available(iOS 17.4, *),
            let cell = tableView.cellForRow(at: indexPath),
            let button = cell.accessoryView as? UIButton {
             button.performPrimaryAction()
             return
         }
-        
+
         let picker = SitePermissionOptionsViewController(
             title: row.title,
             options: SiteSettingsUtils.actionTitles(for: row.permission),
@@ -313,13 +324,13 @@ final class SiteSettingsViewController: UITableViewController {
         }
         navigationController?.pushViewController(picker, animated: true)
     }
-    
+
     @objc private func dismissModal() {
         dismiss(animated: true)
     }
-    
+
     // MARK: - Permissions
-    
+
     @MainActor
     private func loadPermissionsFromGecko() async {
         let permissions = (try? await PermissionDelegate.permissions(
@@ -331,26 +342,26 @@ final class SiteSettingsViewController: UITableViewController {
         loadState = .loaded
         tableView.reloadData()
     }
-    
+
     private func syncStore(with permissions: [ContentPermission]) {
         var seenPermissions = Set<SitePermission>()
-        
+
         for permission in permissions {
             guard let sitePermission = SitePermission(contentPermission: permission),
                   let action = sitePermission == .autoplay ? SitePermissionAction(autoplayValue: permission.rawValue) : SitePermissionAction(value: permission.value) else {
                 continue
             }
-            
+
             if SiteSettingsUtils.isSystemDisabled(sitePermission) {
                 continue
             }
-            
+
             seenPermissions.insert(sitePermission)
             if SitePermissionStore.shared.resolvedAction(for: sitePermission, host: host, session: session) != action {
                 SitePermissionStore.shared.updateAction(action, for: sitePermission, host: host, session: session)
             }
         }
-        
+
         for row in Row.allCases {
             let permission = row.permission
             if !SiteSettingsUtils.isSystemDisabled(permission),
@@ -360,7 +371,7 @@ final class SiteSettingsViewController: UITableViewController {
             }
         }
     }
-    
+
     private func applyOption(at optionIndex: Int, for row: Row) {
         let action: SitePermissionAction
         switch optionIndex {
@@ -371,14 +382,23 @@ final class SiteSettingsViewController: UITableViewController {
         default:
             action = .blocked
         }
-        
+
         setAction(action, for: row.permission)
         tableView.reloadData()
     }
-    
+
     private func setAction(_ action: SitePermissionAction, for permission: SitePermission) {
         SitePermissionStore.shared.updateAction(action, for: permission, host: host, session: session)
         let key = SiteSettingsUtils.geckoKey(for: permission)
+        if action == .askToAllow, permission != .autoplay {
+            PermissionDelegate.removePermission(
+                uri: origin,
+                permissionKey: key,
+                privateMode: session.isPrivateMode
+            )
+            return
+        }
+
         if permission == .autoplay {
             PermissionDelegate.setPermission(
                 uri: origin,
@@ -389,7 +409,7 @@ final class SiteSettingsViewController: UITableViewController {
             session.reload()
             return
         }
-        
+
         PermissionDelegate.setPermission(
             uri: origin,
             permissionKey: key,
@@ -397,8 +417,21 @@ final class SiteSettingsViewController: UITableViewController {
             privateMode: session.isPrivateMode
         )
     }
-    
-    private func resetSitePermissions() {
+
+    private func confirmResetSitePermissions() {
+        AlertPresenter.show(
+            title: nil,
+            message: "This action will reset permissions for this site. It cannot be undone.",
+            buttons: [
+                AlertPresenter.Button(title: "OK", style: .destructive) { [weak self] in
+                    self?.performResetSitePermissions()
+                },
+                AlertPresenter.Button(title: "Cancel"),
+            ]
+        )
+    }
+
+    private func performResetSitePermissions() {
         for permission in loadedGeckoPermissions {
             PermissionDelegate.removePermission(permission)
         }
@@ -409,17 +442,16 @@ final class SiteSettingsViewController: UITableViewController {
                 privateMode: session.isPrivateMode
             )
         }
-        
+
         for permission in SitePermission.allCases {
             SitePermissionStore.shared.removeAction(for: permission, host: host, session: session)
         }
         loadedGeckoPermissions = []
-        didResetSitePermissions = true
         tableView.reloadData()
     }
-    
+
     // MARK: - Helpers
-    
+
     private func configureView() {
         view.backgroundColor = .systemGroupedBackground
         navigationItem.largeTitleDisplayMode = .never
@@ -427,7 +459,7 @@ final class SiteSettingsViewController: UITableViewController {
             SiteSettingsUtils.makeDismissButton(target: self, action: #selector(dismissModal))
         ]
     }
-    
+
     @available(iOS 14.0, *)
     private func permissionMenuButton(for row: Row) -> UIButton {
         let button = UIButton(type: .system)
@@ -443,7 +475,7 @@ final class SiteSettingsViewController: UITableViewController {
         button.sizeToFit()
         return button
     }
-    
+
     @available(iOS 14.0, *)
     private func permissionMenu(for row: Row) -> UIMenu {
         let selectedIndex = selectedOptionIndex(for: row)
@@ -452,13 +484,13 @@ final class SiteSettingsViewController: UITableViewController {
                 self?.applyOption(at: index, for: row)
             }
         }
-        
+
         if #available(iOS 15.0, *) {
             return UIMenu(title: "", options: .singleSelection, children: actions)
         }
         return UIMenu(title: "", children: actions)
     }
-    
+
     private func selectedOptionIndex(for row: Row) -> Int {
         let permission = row.permission
         switch SitePermissionStore.shared.resolvedAction(for: permission, host: host, session: session) {

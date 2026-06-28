@@ -139,6 +139,7 @@ final class TabManagerImplementation: NSObject, TabManager {
     // MARK: - Navigation State
     
     private func loadURL(_ url: String, in tab: Tab) {
+        tab.state.showsStartupHomepage = false
         tab.state.loadingState = .loading(progress: 0)
         if let location = tabLocation(for: tab.id) {
             notifyUpdate(at: location.index, mode: location.mode, reason: .loading)
@@ -223,13 +224,17 @@ final class TabManagerImplementation: NSObject, TabManager {
         return trimmedValue
     }
     
-    private func hasDisplayURL(for tab: Tab) -> Bool {
+    private func displayedURL(for tab: Tab) -> String? {
         switch tab.state.displayState {
         case let .pending(url):
-            return restoredURL(from: url) != nil
+            return restoredURL(from: url)
         case .committed:
-            return restoredURL(from: tab.url) != nil
+            return restoredURL(from: tab.url)
         }
+    }
+    
+    private func hasDisplayURL(for tab: Tab) -> Bool {
+        return displayedURL(for: tab) != nil
     }
     
     private func remoteURL(from value: String?) -> URL? {
@@ -393,14 +398,72 @@ final class TabManagerImplementation: NSObject, TabManager {
         loadURL(url, in: tab)
     }
     
+    @discardableResult
+    func restoreRecentlyClosedTab(id: UUID) -> Bool {
+        guard let snapshot = store.takeRecentlyClosedTab(id: id) else {
+            return false
+        }
+        
+        let tab = Tab(
+            id: snapshot.id,
+            session: createSession(
+                tabID: snapshot.id,
+                url: snapshot.url,
+                windowId: nil,
+                isPrivate: false
+            ),
+            title: snapshot.title,
+            url: snapshot.url,
+            favicon: cachedFavicon(for: snapshot.url),
+            isPrivate: false
+        )
+        tab.state.restoreState = restoredURL(from: snapshot.url).map(TabRestoreState.pending) ?? .none
+        tab.state.navigationState = sessionManager.restoreNavigation(for: tab.id)
+        
+        let index = regularTabs.count
+        regularTabs.append(tab)
+        delegate?.tabManagerDidChangeTabs(self)
+        selectedTabMode = .regular
+        delegate?.tabManager(self, animateNewTabSelectionAt: index) { [weak self] in
+            self?.selectTab(at: index, mode: .regular)
+        }
+        return true
+    }
+    
     // MARK: - Tab Lifecycle
     
-    func createInitialTab() {
-        if restoreTabsIfNeeded() {
+    private func saveClosedTabIfNeeded(_ tab: Tab, mode: TabMode) {
+        guard mode == .regular,
+              let url = displayedURL(for: tab) else {
             return
         }
         
-        addTab(selecting: true, windowId: nil, at: nil, isPrivate: false)
+        store.saveRecentlyClosedTab(id: tab.id, title: tab.title, url: url)
+    }
+    
+    func createInitialTab(openingScreen: HomepageOpeningScreen) {
+        switch openingScreen {
+        case .lastTab:
+            if !restoreTabsIfNeeded() {
+                addTab(selecting: true, windowId: nil, at: nil, isPrivate: false)
+            }
+        case .homepage:
+            createHomepageInitialTab()
+        }
+    }
+    
+    private func createHomepageInitialTab() {
+        let didRestoreTabs = restoreTabsIfNeeded()
+        
+        if didRestoreTabs,
+           let selectedTab,
+           displayedURL(for: selectedTab) == nil {
+            selectedTab.state.showsStartupHomepage = true
+            return
+        }
+        
+        let index = addTab(selecting: true, windowId: nil, at: nil, isPrivate: false)
+        regularTabs[index].state.showsStartupHomepage = true
     }
     
     @discardableResult
@@ -558,6 +621,7 @@ final class TabManagerImplementation: NSObject, TabManager {
         } else {
             removedTab = privateTabs.remove(at: index)
         }
+        saveClosedTabIfNeeded(removedTab, mode: mode)
         if wasSelected {
             sessionManager.deactivate(removedTab.session)
         }
@@ -572,7 +636,7 @@ final class TabManagerImplementation: NSObject, TabManager {
         if regularTabs.isEmpty && privateTabs.isEmpty {
             delegate?.tabManagerDidChangeTabs(self)
             persistState()
-            sessionManager.discard(removedTab.session, forTab: removedTab.id)
+            sessionManager.discard(removedTab.session, forTab: removedTab.id, keepingHistory: mode == .regular)
             return
         }
         
@@ -589,7 +653,7 @@ final class TabManagerImplementation: NSObject, TabManager {
             persistState()
         }
         
-        sessionManager.discard(removedTab.session, forTab: removedTab.id)
+        sessionManager.discard(removedTab.session, forTab: removedTab.id, keepingHistory: mode == .regular)
     }
     
     func removeAllTabs(mode: TabMode? = nil) {
@@ -610,6 +674,7 @@ final class TabManagerImplementation: NSObject, TabManager {
             privateTabs.removeAll(keepingCapacity: true)
             selectedPrivateTabIndex = -1
         }
+        removedTabs.forEach { saveClosedTabIfNeeded($0, mode: mode) }
         removedTabs.forEach { cancelFaviconTask(for: $0.id) }
         delegate?.tabManagerDidChangeTabs(self)
         
@@ -625,7 +690,7 @@ final class TabManagerImplementation: NSObject, TabManager {
             persistState()
         }
         
-        removedTabs.forEach { sessionManager.discard($0.session, forTab: $0.id) }
+        removedTabs.forEach { sessionManager.discard($0.session, forTab: $0.id, keepingHistory: mode == .regular) }
     }
     
     // MARK: - Browsing
@@ -645,6 +710,9 @@ final class TabManagerImplementation: NSObject, TabManager {
         
         tab.state.suppressInitialNavigation = false
         tab.state.displayState = .pending(navigationInput)
+        if let location = tabLocation(for: tab.id) {
+            notifyUpdate(at: location.index, mode: location.mode, reason: .location)
+        }
         
         let navigationInputRange = NSRange(location: 0, length: (navigationInput as NSString).length)
         let shouldNavigateDirectly = lenientURLExpression.firstMatch(in: navigationInput, range: navigationInputRange) != nil
@@ -741,14 +809,15 @@ final class TabManagerImplementation: NSObject, TabManager {
         return url
     }
     
-    func updateThumbnail(_ image: UIImage?, forTabAt index: Int) {
-        guard tabs(for: selectedTabMode).indices.contains(index) else {
+    func updateThumbnail(_ image: UIImage?, forTabAt index: Int, mode: TabMode) {
+        guard tabs(for: mode).indices.contains(index) else {
             return
         }
         
-        let tab = tabs(for: selectedTabMode)[index]
+        let tab = tabs(for: mode)[index]
         tab.thumbnail = image
         store.persistThumbnail(image, for: tab.id)
+        notifyUpdate(at: index, mode: mode, reason: .thumbnail)
     }
     
     // MARK: - Session Factory

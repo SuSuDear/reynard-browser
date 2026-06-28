@@ -28,7 +28,6 @@ final class SitePermissionsViewController: SettingsTableViewController {
     }
     
     private enum Row {
-        case autoplay
         case camera
         case microphone
         case location
@@ -39,8 +38,6 @@ final class SitePermissionsViewController: SettingsTableViewController {
         
         var title: String {
             switch self {
-            case .autoplay:
-                return L10n.string("permissions.autoplay")
             case .camera:
                 return L10n.string("permissions.camera")
             case .microphone:
@@ -60,8 +57,6 @@ final class SitePermissionsViewController: SettingsTableViewController {
         
         var permission: SitePermission {
             switch self {
-            case .autoplay:
-                return .autoplay
             case .camera:
                 return .camera
             case .microphone:
@@ -81,7 +76,6 @@ final class SitePermissionsViewController: SettingsTableViewController {
     }
     
     private let permissionOptions: [Row] = [
-        .autoplay,
         .camera,
         .microphone,
         .location,
@@ -90,7 +84,6 @@ final class SitePermissionsViewController: SettingsTableViewController {
         .localDeviceAccess,
         .localNetworkAccess,
     ]
-    private var hasResetAllSitePermissions = false
     
     private var displayedSections: [Section] {
         var sections: [Section] = []
@@ -193,11 +186,7 @@ final class SitePermissionsViewController: SettingsTableViewController {
             case .resetPermissions:
                 cell.textLabel?.text = L10n.string("permissions.reset_all_sites")
                 cell.textLabel?.textColor = .systemRed
-                if hasResetAllSitePermissions {
-                    cell.detailTextLabel?.text = L10n.string("permissions.reset_all_sites_success")
-                } else {
-                    cell.detailTextLabel?.text = nil
-                }
+                cell.detailTextLabel?.text = nil
                 cell.detailTextLabel?.textColor = .secondaryLabel
                 cell.accessoryType = .none
                 return cell
@@ -239,7 +228,7 @@ final class SitePermissionsViewController: SettingsTableViewController {
             }
             switch WebsiteActionRow.allCases[indexPath.row] {
             case .resetPermissions:
-                resetSitePermissions()
+                confirmResetSitePermissions()
             }
         }
     }
@@ -269,24 +258,16 @@ final class SitePermissionsViewController: SettingsTableViewController {
         return permissionOptions[safe: indexPath.row]
     }
     
-    private func resetSitePermissions() {
-        let actions: [SitePermissionAction] = [
-            .allowed,
-            .askToAllow,
-            .blocked,
-        ]
-        
-        for row in permissionOptions {
-            for action in actions {
-                let entries = SitePermissionStore.shared.storedHosts(for: row.permission, action: action)
-                for entry in entries {
-                    SitePermissionStore.shared.removePersistedAction(for: row.permission, host: entry.host)
-                    SiteSettingsUtils.clearGeckoPermission(for: row.permission, host: entry.host)
-                }
-            }
-        }
-        
-        hasResetAllSitePermissions = true
-        tableView.reloadData()
+    private func confirmResetSitePermissions() {
+        AlertPresenter.show(
+            title: nil,
+            message: "This action will reset permissions for all sites. It cannot be undone.",
+            buttons: [
+                AlertPresenter.Button(title: "OK", style: .destructive) {
+                    SiteSettingsUtils.resetStoredSitePermissions()
+                },
+                AlertPresenter.Button(title: "Cancel"),
+            ]
+        )
     }
 }

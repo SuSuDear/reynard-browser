@@ -11,6 +11,7 @@ protocol AddressBarDelegate: AnyObject {
     func addressBarDidRequestReloadOrStop(_ addressBar: AddressBar)
     func addressBarAddonItems(_ addressBar: AddressBar) -> [AddressBarMenu.AddonItem]
     func addressBar(_ addressBar: AddressBar, didSelectAddon item: AddonMenuItem)
+    func addressBarDidRequestPageZoom(_ addressBar: AddressBar)
     func addressBarDidRequestWebsiteModeChange(_ addressBar: AddressBar)
     func addressBar(_ addressBar: AddressBar, didRequestAddressBarPosition position: BrowserChromePosition)
     func addressBarDidRequestWebsiteSettings(_ addressBar: AddressBar)
@@ -225,11 +226,16 @@ final class AddressBar: UIView {
         configureHierarchy()
         configureConstraints()
         configureTargets()
+        configureObservers()
         applyState()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     override var canBecomeFirstResponder: Bool {
@@ -292,6 +298,10 @@ final class AddressBar: UIView {
             onAddonSelected: { [weak self] item in
                 guard let self else { return }
                 self.delegate?.addressBar(self, didSelectAddon: item)
+            },
+            onPageZoom: { [weak self] in
+                guard let self else { return }
+                self.delegate?.addressBarDidRequestPageZoom(self)
             },
             onChangeWebsiteMode: { [weak self] in
                 guard let self else { return }
@@ -552,6 +562,15 @@ final class AddressBar: UIView {
         dismissButton.addTarget(self, action: #selector(handleDismissButtonTap), for: .touchUpInside)
     }
     
+    private func configureObservers() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(showFullWebsiteAddressDidChange),
+            name: .showFullWebsiteAddressDidChange,
+            object: nil
+        )
+    }
+    
     // MARK: - State Rendering
     
     private func applyState() {
@@ -709,7 +728,8 @@ final class AddressBar: UIView {
             return nil
         }
         
-        guard canShowBarMenu,
+        guard !Prefs.AppearanceSettings.showsFullWebsiteAddress,
+              canShowBarMenu,
               let host = locationHost() else {
             return NSAttributedString(
                 string: currentText,
@@ -747,6 +767,14 @@ final class AddressBar: UIView {
             return nil
         }
         return host
+    }
+    
+    @objc
+    private func showFullWebsiteAddressDidChange() {
+        guard editingState == .inactive else {
+            return
+        }
+        applyState()
     }
     
     // MARK: - Actions

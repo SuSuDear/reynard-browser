@@ -184,6 +184,16 @@ final class BookmarkStore {
         }
     }
     
+    func favoritesFolderContents() -> BookmarkFolderContentsSnapshot {
+        stateQueue.sync {
+            let parent = folderSnapshotLocked(guid: Constants.favoritesFolderGUID) ?? rootFolderSnapshotLocked()
+            return BookmarkFolderContentsSnapshot(
+                parent: parent,
+                items: fetchFolderContentsLocked(parentGUID: parent.guid)
+            )
+        }
+    }
+    
     func contents(of parentGUID: String? = nil) -> BookmarkFolderContentsSnapshot {
         stateQueue.sync {
             let requestedParentGUID = resolvedParentGUID(for: parentGUID)
@@ -1188,7 +1198,7 @@ final class BookmarkStore {
         guard let statement = prepareStatementLocked(
    """
    UPDATE \(Constants.structureTableName)
-   SET idx = idx - 1
+   SET idx = -idx - 1
    WHERE parent = ?
      AND idx > ?;
    """
@@ -1202,7 +1212,27 @@ final class BookmarkStore {
         
         bind(parentGUID, to: statement, at: 1)
         sqlite3_bind_int64(statement, 2, Int64(removedIndex))
-        return sqlite3_step(statement) == SQLITE_DONE
+        guard sqlite3_step(statement) == SQLITE_DONE else {
+            return false
+        }
+        
+        guard let finalStatement = prepareStatementLocked(
+   """
+   UPDATE \(Constants.structureTableName)
+   SET idx = -idx - 2
+   WHERE parent = ?
+     AND idx < 0;
+   """
+        ) else {
+            return false
+        }
+        
+        defer {
+            sqlite3_finalize(finalStatement)
+        }
+        
+        bind(parentGUID, to: finalStatement, at: 1)
+        return sqlite3_step(finalStatement) == SQLITE_DONE
     }
     
     private func updateStructureOrderLocked(childGUIDs: [String], parentGUID: String) -> Bool {

@@ -9,9 +9,9 @@ import UIKit
 
 final class BrowserChrome: UIView {
     private enum UX {
-        static let overlayMinimumAddressBarPadding: CGFloat = 32
-        static let overlayMinimumWidthRatio: CGFloat = 3.0 / 5.0
         static let overlayTopSpacing: CGFloat = 12
+        static let actionBarSpacing: CGFloat = 0
+        static let actionBarAnimationDuration: TimeInterval = 0.12
     }
     
     enum PresentationState {
@@ -25,6 +25,15 @@ final class BrowserChrome: UIView {
         case focused
         case scrollingEmbeddedSuggestions
         case scrollingDetachedSuggestions
+        
+        var showsAddressBarDismissButton: Bool {
+            switch self {
+            case .inactive:
+                return false
+            case .focused, .scrollingEmbeddedSuggestions, .scrollingDetachedSuggestions:
+                return true
+            }
+        }
     }
     
     struct State {
@@ -34,7 +43,10 @@ final class BrowserChrome: UIView {
         let search: SearchState
         let topInset: CGFloat
         let interfaceIdiom: UIUserInterfaceIdiom
+        let orientation: BrowserLayout.ViewportOrientation
+        let isTwoThirdSplitScreenOrSmaller: Bool
         let sidebarButtonVisible: Bool
+        let animatesChromeStateChanges: Bool
     }
     
     var onSidebar: (() -> Void)?
@@ -45,6 +57,10 @@ final class BrowserChrome: UIView {
     var onDownloads: (() -> Void)?
     var onNewTab: (() -> Void)?
     var onTabOverview: (() -> Void)?
+    var onOverlayDismiss: (() -> Void)?
+    var onPageZoomOut: (() -> Void)?
+    var onPageZoomIn: (() -> Void)?
+    var onPageZoomReset: (() -> Void)?
     
     private let addressBar: AddressBar = {
         let view = AddressBar()
@@ -54,13 +70,23 @@ final class BrowserChrome: UIView {
     
     private let topToolbar: TopToolbar
     private let bottomToolbar: BottomToolbar
+    private let overlayDismissView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .clear
+        view.isHidden = true
+        return view
+    }()
     private let overlayContentView = ChromeOverlayContentView()
+    private let actionBar = ActionBar()
     
     private var bottomConstraint: NSLayoutConstraint!
     private var overlayWidthConstraint: NSLayoutConstraint!
     private var overlayHeightConstraint: NSLayoutConstraint!
     private var overlayTopConstraint: NSLayoutConstraint?
     private var overlayCenterXConstraint: NSLayoutConstraint?
+    private var actionBarTopConstraint: NSLayoutConstraint?
+    private var actionBarBottomConstraint: NSLayoutConstraint?
     
     private var state: State?
     
@@ -74,6 +100,7 @@ final class BrowserChrome: UIView {
         configureHierarchy()
         configureConstraints()
         configureToolbarActions()
+        configureOverlayDismissGesture()
     }
     
     required init?(coder: NSCoder) {
@@ -87,10 +114,7 @@ final class BrowserChrome: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        overlayWidthConstraint.constant = max(
-            addressBar.bounds.width + UX.overlayMinimumAddressBarPadding,
-            bounds.width * UX.overlayMinimumWidthRatio
-        )
+        updateOverlayWidth()
     }
     
     // MARK: - Anchors And Frames
@@ -122,13 +146,22 @@ final class BrowserChrome: UIView {
         self.state = state
         addressBar.updateLayout(position: state.position, chromeMode: state.mode)
         attachAddressBar(for: state.mode)
+        attachActionBar(for: state.mode)
         configureOverlayPositioningIfNeeded()
+        overlayContentView.setLayoutMode(overlayLayoutMode(for: state))
+        updateOverlayWidth()
+        updateOverlayHeight()
+        let canUseActionBar = state.presentation == .browsing && state.search == .inactive
+        actionBar.isUserInteractionEnabled = canUseActionBar
+        if !canUseActionBar {
+            dismissActionBar(animated: false)
+        }
         
         let topState: TopToolbar.LayoutState
         let bottomState: BottomToolbar.LayoutState
         if state.presentation != .browsing {
             topState = .hidden
-            bottomState = .hidden
+            bottomState = state.mode == .compact ? .collapsed : .hidden
         } else {
             topState = resolvedTopState(for: state)
             bottomState = resolvedBottomState(for: state)
@@ -145,14 +178,67 @@ final class BrowserChrome: UIView {
             hidesButtons: state.search == .scrollingEmbeddedSuggestions
         )
         addressBar.setDismissButtonVisible(
-            state.search == .focused && state.presentation == .browsing,
-            animated: false
+            state.search.showsAddressBarDismissButton && state.presentation == .browsing,
+            animated: state.animatesChromeStateChanges
         )
     }
     
     func dockAddressBar(offset: CGFloat) {
         bottomConstraint.constant = offset
         bottomToolbar.setVerticalOffset(offset)
+    }
+    
+    // MARK: - Action Bar
+    
+    func showActionBar(_ item: ActionBar.Item, animated: Bool) {
+        guard state?.presentation == .browsing,
+              state?.search == .inactive else {
+            return
+        }
+        
+        actionBar.setItem(item)
+        showActionBar(animated: animated)
+    }
+    
+    func dismissActionBar(animated: Bool) {
+        guard !actionBar.isHidden else { return }
+        
+        let finish = {
+            self.actionBar.setItem(nil)
+        }
+        
+        guard animated else {
+            actionBar.alpha = 0
+            finish()
+            return
+        }
+        
+        UIView.animate(withDuration: UX.actionBarAnimationDuration, animations: {
+            self.actionBar.alpha = 0
+        }) { _ in
+            finish()
+        }
+    }
+    
+    func setPageZoomLevel(_ level: Int) {
+        actionBar.setPageZoomLevel(level)
+    }
+    
+    func updatePageZoomLevel(_ level: Int) {
+        guard !actionBar.isHidden,
+              actionBar.item == .pageZoom else {
+            return
+        }
+        
+        actionBar.setPageZoomLevel(level)
+    }
+    
+    func nextPageZoomLevel() -> Int {
+        return actionBar.nextPageZoomLevel()
+    }
+    
+    func previousPageZoomLevel() -> Int {
+        return actionBar.previousPageZoomLevel()
     }
     
     // MARK: - Overlay Content
@@ -162,7 +248,11 @@ final class BrowserChrome: UIView {
         animated: Bool,
         completion: (() -> Void)? = nil
     ) {
-        overlayContentView.setPresentation(presentation, animated: animated, completion: completion)
+        setOverlayDismissViewVisible(presentation != .hidden)
+        overlayContentView.setPresentation(presentation, animated: animated) { [weak self] in
+            self?.setOverlayDismissViewVisible(presentation != .hidden)
+            completion?()
+        }
     }
     
     func setOverlayHeightMode(_ heightMode: ChromeOverlayContentView.HeightMode) {
@@ -194,6 +284,23 @@ final class BrowserChrome: UIView {
     
     private func updateOverlayHeight() {
         overlayHeightConstraint.constant = overlayContentView.resolvedHeight
+    }
+    
+    private func updateOverlayWidth() {
+        overlayWidthConstraint.constant = overlayContentView.layoutMode.resolvedWidth(addressBarWidth: addressBar.bounds.width)
+    }
+    
+    private func overlayLayoutMode(for state: State) -> ChromeOverlayContentView.LayoutMode {
+        switch (state.interfaceIdiom, state.orientation) {
+        case (.pad, .portrait):
+            return .padPortrait
+        case (.pad, .landscape) where state.isTwoThirdSplitScreenOrSmaller:
+            return .padConstrained
+        case (.pad, .landscape):
+            return .padLandscape
+        default:
+            return .phoneLandscape
+        }
     }
     
     private func configureOverlayPositioningIfNeeded() {
@@ -273,6 +380,13 @@ final class BrowserChrome: UIView {
         addressBar.applySearchAutocomplete(query: query, result: result)
     }
     
+    func resetAddressBarEditing() {
+        _ = addressBar.resignFirstResponder()
+        addressBar.clearAutocomplete()
+        addressBar.setPreservesAutocompleteAfterResign(false)
+        addressBar.setEditingState(.inactive)
+    }
+    
     func resetHorizontalTransition() { addressBar.resetHorizontalTransition() }
     func resignAddressBarFirstResponder() { _ = addressBar.resignFirstResponder() }
     
@@ -326,16 +440,29 @@ final class BrowserChrome: UIView {
         bottomToolbar.onLibrary = { [weak self] in self?.onLibrary?() }
         bottomToolbar.onDownloads = { [weak self] in self?.onDownloads?() }
         bottomToolbar.onTabOverview = { [weak self] in self?.onTabOverview?() }
+        
+        actionBar.onPageZoomOut = { [weak self] in self?.onPageZoomOut?() }
+        actionBar.onPageZoomIn = { [weak self] in self?.onPageZoomIn?() }
+        actionBar.onPageZoomReset = { [weak self] in self?.onPageZoomReset?() }
+        actionBar.onClose = { [weak self] in self?.dismissActionBar(animated: true) }
     }
     
     // MARK: - Transitions
     
-    func bottomToolbarSnapshot() -> UIView? {
+    func bottomToolbarTransitionView() -> UIView? {
         return bottomToolbar.snapshotView(afterScreenUpdates: false)
     }
     
-    func bottomToolbarFrame(in view: UIView) -> CGRect {
+    func bottomToolbarTransitionFrame(in view: UIView) -> CGRect {
         return bottomToolbar.convert(bottomToolbar.bounds, to: view)
+    }
+    
+    func topToolbarTransitionView() -> UIView? {
+        return topToolbar.snapshotView(afterScreenUpdates: false)
+    }
+    
+    func topToolbarTransitionFrame(in view: UIView) -> CGRect {
+        return topToolbar.convert(topToolbar.bounds, to: view)
     }
     
     func setChromeTransition(topAlpha: CGFloat, bottomAlpha: CGFloat, bottomTranslationY: CGFloat = 0) {
@@ -366,7 +493,9 @@ final class BrowserChrome: UIView {
     private func configureHierarchy() {
         addSubview(topToolbar)
         addSubview(bottomToolbar)
+        addSubview(overlayDismissView)
         addSubview(overlayContentView)
+        addSubview(actionBar)
     }
     
     private func configureConstraints() {
@@ -382,10 +511,31 @@ final class BrowserChrome: UIView {
             bottomToolbar.trailingAnchor.constraint(equalTo: trailingAnchor),
             bottomConstraint,
             
+            overlayDismissView.topAnchor.constraint(equalTo: topToolbar.bottomAnchor),
+            overlayDismissView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            overlayDismissView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            overlayDismissView.bottomAnchor.constraint(equalTo: bottomToolbar.topAnchor),
+            
             overlayWidthConstraint,
             overlayHeightConstraint,
+            
+            actionBar.leadingAnchor.constraint(equalTo: leadingAnchor),
+            actionBar.trailingAnchor.constraint(equalTo: trailingAnchor),
         ])
         bottomToolbar.configureTopAnchor(to: safeAreaLayoutGuide.bottomAnchor)
+    }
+    
+    private func configureOverlayDismissGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(overlayDismissViewTapped))
+        overlayDismissView.addGestureRecognizer(tapGesture)
+    }
+    
+    private func setOverlayDismissViewVisible(_ visible: Bool) {
+        overlayDismissView.isHidden = !visible
+    }
+    
+    @objc private func overlayDismissViewTapped() {
+        onOverlayDismiss?()
     }
     
     // MARK: - State Resolution
@@ -399,6 +549,42 @@ final class BrowserChrome: UIView {
         case .compact, .pad:
             topToolbar.attachAddressBar(addressBar)
         }
+    }
+    
+    private func attachActionBar(for mode: BrowserChromeMode) {
+        NSLayoutConstraint.deactivate([actionBarTopConstraint, actionBarBottomConstraint].compactMap { $0 })
+        switch mode {
+        case .pad:
+            let constraint = actionBar.bottomAnchor.constraint(
+                equalTo: bottomAnchor,
+                constant: -UX.actionBarSpacing
+            )
+            constraint.isActive = true
+            actionBarBottomConstraint = constraint
+            actionBarTopConstraint = nil
+        case .phone, .compact:
+            let constraint = actionBar.bottomAnchor.constraint(
+                equalTo: bottomToolbar.topAnchor,
+                constant: -UX.actionBarSpacing
+            )
+            constraint.isActive = true
+            actionBarBottomConstraint = constraint
+            actionBarTopConstraint = nil
+        }
+    }
+    
+    private func showActionBar(animated: Bool) {
+        actionBar.isHidden = false
+        let animations = {
+            self.actionBar.alpha = 1
+        }
+        
+        guard animated else {
+            animations()
+            return
+        }
+        
+        UIView.animate(withDuration: UX.actionBarAnimationDuration, animations: animations)
     }
     
     private func resolvedTopState(for state: State) -> TopToolbar.LayoutState {

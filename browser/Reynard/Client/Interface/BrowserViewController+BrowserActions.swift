@@ -53,26 +53,16 @@ extension BrowserViewController {
     }
     
     func createNewTab() {
-        browserChrome.clearAddressBarAutocomplete()
-        searchOverlayCoordinator.endSearchSession()
-        view.endEditing(true)
+        dismissAddressBarEditingAndOverlays()
         
         if tabOverview.isPresented {
-            let mode = tabOverview.mode
-            tabOverview.prepareNewTabInsertion { [weak self] in
-                guard let self else {
-                    return
-                }
-                let newTabIndex = self.tabManager.createTab(
-                    selecting: true,
-                    target: .end,
-                    mode: mode.tabMode
-                )
-                self.tabBar.setPendingExpansion(at: newTabIndex)
-            }
+            tabOverview.prepareNextTabChangesWithoutAnimation()
+            createTabFromOverview(mode: tabOverview.mode.tabMode)
         } else {
-            let newTabIndex = tabManager.createTab(selecting: true)
-            tabBar.setPendingExpansion(at: newTabIndex)
+            homepageOverlayCoordinator.prepareHomepageForNewTab(mode: tabManager.selectedTabMode)
+            let createdIndex = tabManager.createTab(selecting: true)
+            applyNewTabDisplayOption(toTabAt: createdIndex)
+            tabBar.setPendingExpansion(at: createdIndex)
             setTabOverviewVisible(false, animated: true)
         }
     }

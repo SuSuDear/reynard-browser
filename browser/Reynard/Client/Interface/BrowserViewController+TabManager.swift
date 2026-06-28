@@ -25,6 +25,7 @@ extension BrowserViewController: TabManagerDelegate {
         tabOverview.applyPendingTabChanges()
         tabBar.reloadTabs()
         updateBrowserLayout(animated: false)
+        homepageOverlayCoordinator.updatePresentation(animated: false)
         tabBar.updateLayout()
     }
     
@@ -40,16 +41,18 @@ extension BrowserViewController: TabManagerDelegate {
             isLoading: selectedTab.state.loadingState.isLoading
         )
         refreshAddressBar()
+        browserChrome.updatePageZoomLevel(selectedTab.session.settings.pageZoom.level)
         updateNavigationButtons()
         
         contentView.setSession(selectedTab.session)
         addonCoordinator.handleTabSelectionChange(selectedIndex: index, previousIndex: previousIndex)
         
-        if !tabOverview.isPresented {
+        if !tabOverview.isPresented && !tabOverview.isTransitionRunning {
             tabOverview.setMode(TabOverview.Mode(tabMode: tabManager.selectedTabMode), animated: false)
             tabOverview.reloadTabs()
         }
         tabBar.reloadTabs()
+        homepageOverlayCoordinator.updatePresentation(animated: false)
         
         if isShowingFullscreenMedia,
            fullscreenSession !== selectedTab.session {
@@ -105,8 +108,11 @@ extension BrowserViewController: TabManagerDelegate {
             
         case .location:
             if index == tabManager.selectedTabIndex {
+                let tab = tabManager.activeTabs[index]
                 refreshAddressBar()
+                browserChrome.updatePageZoomLevel(tab.session.settings.pageZoom.level)
                 updateNavigationButtons()
+                homepageOverlayCoordinator.updatePresentation(animated: true)
             }
             
         case .favicon:
@@ -127,12 +133,20 @@ extension BrowserViewController: TabManagerDelegate {
                     tab.state.loadingState.progress,
                     isLoading: tab.state.loadingState.isLoading
                 )
+                
+                if !tab.state.loadingState.isLoading {
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self,
+                              index == self.tabManager.selectedTabIndex else {
+                            return
+                        }
+                        
+                        self.captureThumbnail(forTabAt: index, mode: self.tabManager.selectedTabMode)
+                    }
+                }
             }
             
         case .thumbnail:
-            if index == tabManager.selectedTabIndex {
-                captureThumbnailForVisibleTab(at: index)
-            }
             tabOverview.isPresented
             ? tabOverview.refreshTab(at: index, mode: tabManager.selectedTabMode)
             : tabOverview.reloadTabs()
@@ -145,8 +159,18 @@ extension BrowserViewController: TabManagerDelegate {
             return
         }
         
-        tabBar.setPendingExpansion(at: index)
-        browserChrome.animateAutomaticNewTabTransition(to: tabManager.activeTabs[index], completion: completion)
+        let selectedIndex = tabManager.selectedTabIndex
+        let selectedMode = tabManager.selectedTabMode
+        captureThumbnail(forTabAt: selectedIndex, mode: selectedMode) { [weak self] _ in
+            guard let self,
+                  tabManager.activeTabs.indices.contains(index) else {
+                completion()
+                return
+            }
+            
+            self.tabBar.setPendingExpansion(at: index)
+            self.browserChrome.animateAutomaticNewTabTransition(to: tabManager.activeTabs[index], completion: completion)
+        }
     }
     
     func tabManager(_ tabManager: TabManager, didRequestDownload download: DownloadStore.PendingDownload) {
@@ -161,14 +185,59 @@ extension BrowserViewController: TabManagerDelegate {
 }
 
 extension BrowserViewController {
-    func captureThumbnailForVisibleTab(at index: Int) {
-        guard !contentView.isHidden,
-              let tab = tabManager.activeTabs[safe: index],
-              contentView.isDisplaying(session: tab.session),
-              let image = contentView.makeThumbnail() else {
+    func applyNewTabDisplayOption(toTabAt index: Int) {
+        switch Prefs.NewTabSettings.newTabDisplayOption {
+        case .homepage, .blankPage:
+            captureThumbnail(forTabAt: index, mode: tabManager.selectedTabMode)
+        case .customURL:
+            guard let tab = tabManager.activeTabs[safe: index],
+                  URLUtils.isWebURL(Prefs.NewTabSettings.customNewTabURL) else {
+                return
+            }
+            
+            tabManager.browse(to: Prefs.NewTabSettings.customNewTabURL, in: tab)
+        }
+    }
+    
+    func captureThumbnail(forTabAt index: Int, mode: TabMode, completion: ((UIImage?) -> Void)? = nil) {
+        let targetTabs = mode == .private ? tabManager.privateTabs : tabManager.regularTabs
+        guard let targetTab = targetTabs[safe: index] else {
+            completion?(nil)
             return
         }
         
-        tabManager.updateThumbnail(image, forTabAt: index)
+        let targetTabID = targetTab.id
+        if homepageOverlayCoordinator.needsHomepageThumbnail(for: targetTab) {
+            homepageOverlayCoordinator.captureHomepageThumbnail(targetTab, size: contentView.bounds.size) { [weak self] thumbnail in
+                guard let self,
+                      let thumbnail,
+                      (mode == .private ? self.tabManager.privateTabs : self.tabManager.regularTabs)[safe: index]?.id == targetTabID else {
+                    completion?(nil)
+                    return
+                }
+                
+                self.tabManager.updateThumbnail(thumbnail, forTabAt: index, mode: mode)
+                completion?(thumbnail)
+            }
+            return
+        }
+        
+        guard mode == tabManager.selectedTabMode,
+              index == tabManager.selectedTabIndex,
+              let tab = tabManager.activeTabs[safe: index],
+              tab.id == targetTabID,
+              !contentView.isHidden,
+              contentView.isDisplaying(session: tab.session) else {
+            completion?(nil)
+            return
+        }
+        
+        guard let thumbnail = contentView.makeThumbnail() else {
+            completion?(nil)
+            return
+        }
+        
+        tabManager.updateThumbnail(thumbnail, forTabAt: index, mode: mode)
+        completion?(thumbnail)
     }
 }

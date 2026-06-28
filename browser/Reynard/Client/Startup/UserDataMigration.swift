@@ -51,6 +51,7 @@ final class UserDataMigration {
         removeLegacyUserAgentOverride()
     }
     
+    // MARK: - Store Migration (0.4.0)
     private func migrateAppDataToApplicationSupport() {
         let sourceURL = documentsAppDataDirectoryURL
         let destinationURL = applicationSupportAppDataDirectoryURL

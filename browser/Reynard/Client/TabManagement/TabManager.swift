@@ -21,7 +21,7 @@ protocol TabManager: AnyObject {
     var selectedTabIndex: Int { get }
     var selectedTab: Tab? { get }
     
-    func createInitialTab()
+    func createInitialTab(openingScreen: HomepageOpeningScreen)
     @discardableResult
     func addTab(selecting: Bool, windowId: String?, at index: Int?, isPrivate: Bool) -> Int
     @discardableResult
@@ -30,6 +30,8 @@ protocol TabManager: AnyObject {
     func moveTab(from sourceIndex: Int, to destinationIndex: Int, mode: TabMode?)
     func removeTab(at index: Int, mode: TabMode?)
     func removeAllTabs(mode: TabMode?)
+    @discardableResult
+    func restoreRecentlyClosedTab(id: UUID) -> Bool
     func browse(to term: String)
     func browse(to term: String, in tab: Tab)
     func goBack()
@@ -37,7 +39,7 @@ protocol TabManager: AnyObject {
     func replaceSelectedSession(with session: GeckoSession, url: String, title: String?)
     func tabIndex(for session: GeckoSession) -> Int?
     func shareableURL(for tab: Tab) -> URL?
-    func updateThumbnail(_ image: UIImage?, forTabAt index: Int)
+    func updateThumbnail(_ image: UIImage?, forTabAt index: Int, mode: TabMode)
     @discardableResult
     func changeWebsiteModeForSelectedTab() -> Bool
 }

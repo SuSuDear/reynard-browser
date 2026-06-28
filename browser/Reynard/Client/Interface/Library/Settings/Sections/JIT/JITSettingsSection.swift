@@ -54,7 +54,7 @@ final class JITSettingsSection: NSObject {
         case .importPairingFile:
             let cell = SettingsViewUtils.actionCell(title: L10n.string("jit.import_pairing_file"), tintColor: tintColor)
             
-            if #available(iOS 16.6, *) {
+            if #available(iOS 16.7, *) {
                 if #unavailable(iOS 17.4) {
                     cell.textLabel?.textColor = .secondaryLabel
                     cell.selectionStyle = .none
@@ -81,7 +81,7 @@ final class JITSettingsSection: NSObject {
         }
         stackView.addArrangedSubview(performanceDetailLabel())
         
-        if #available(iOS 16.6, *) {
+        if #available(iOS 16.7, *) {
             if #unavailable(iOS 17.4) {
                 stackView.addArrangedSubview(unsupportedVersionWarningLabel())
             }
