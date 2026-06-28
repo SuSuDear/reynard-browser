@@ -40,7 +40,7 @@ jobs:
       FIREFOX_RELEASE_TAG_FILE: engine/release.txt
       USE_PREBUILT_GECKO: 'true'
       GECKO_DIST_URL: https://github.com/SuSuDear/gecko-ios-builder/releases/download/gecko-ios-aarch64-portable/gecko-ios-aarch64-dist.tar.zst
-      GECKO_DIST_SHA256: bd733355162a21e859a4510db4203b972725829818f1676c36a9fc0ea82cc9a4
+      GECKO_DIST_SHA256: 20dc7639900c1c31327cffb783e9a2479c1665de82faf74874076e417766f4a8
       # Firefox 151's mobile/ios target requires iOS SDK >= 26.4, which only
       # ships in Xcode 26+. macos-26 runner has Xcode 26.4.1 as default.
       MACH_BUILD_PYTHON_NATIVE_PACKAGE_SOURCE: system
