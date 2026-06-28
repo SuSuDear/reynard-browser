@@ -9,6 +9,7 @@
 "address_bar.website_settings" = "网站设置";
 "address_bar.show_top_address_bar" = "显示顶部地址栏";
 "address_bar.show_bottom_tab_bar" = "显示底部标签栏";
+"address_bar.page_zoom" = "页面缩放";
 "open_in.no_link" = "未提供链接。";
 "open_in.unable_to_open" = "无法打开 Reynard。";
 "common.delete" = "删除";
