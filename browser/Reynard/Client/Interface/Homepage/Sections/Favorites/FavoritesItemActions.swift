@@ -19,27 +19,27 @@ struct FavoritesItemActions {
         return UIContextMenuConfiguration(identifier: bookmark.guid as NSString, previewProvider: nil) { _ in
             UIMenu(title: "", children: [
                 UIMenu(title: "", options: .displayInline, children: [
-                    UIAction(title: "Open in New Tab", image: UIImage(named: "reynard.plus.square.on.square")) { _ in
+                    UIAction(title: L10n.string("context_menu.open_new_tab"), image: UIImage(named: "reynard.plus.square.on.square")) { _ in
                         openInNewTab()
                     },
-                    UIAction(title: "Open in New Private Tab", image: UIImage(named: "reynard.plus.square.on.square")) { _ in
+                    UIAction(title: L10n.string("context_menu.open_new_private_tab"), image: UIImage(named: "reynard.plus.square.on.square")) { _ in
                         openInNewPrivateTab()
                     },
                 ]),
                 UIMenu(title: "", options: .displayInline, children: [
-                    UIAction(title: "Copy Link", image: UIImage(named: "reynard.document.on.document")) { _ in
+                    UIAction(title: L10n.string("context_menu.copy_link"), image: UIImage(named: "reynard.document.on.document")) { _ in
                         UIPasteboard.general.string = bookmark.url.absoluteString
                     },
-                    UIAction(title: "Share Link", image: UIImage(named: "reynard.square.and.arrow.up")) { _ in
+                    UIAction(title: L10n.string("context_menu.share_link"), image: UIImage(named: "reynard.square.and.arrow.up")) { _ in
                         shareLink(bookmark.url)
                     },
                 ]),
                 UIMenu(title: "", options: .displayInline, children: [
-                    UIAction(title: "Edit Bookmark", image: UIImage(named: "reynard.pencil")) { _ in
+                    UIAction(title: L10n.string("address_bar.edit_bookmark"), image: UIImage(named: "reynard.pencil")) { _ in
                         editBookmark()
                     },
                     UIAction(
-                        title: "Delete Bookmark",
+                        title: L10n.string("bookmarks.delete_bookmark"),
                         image: UIImage(named: "reynard.trash"),
                         attributes: .destructive
                     ) { _ in
@@ -57,7 +57,7 @@ struct FavoritesItemActions {
         return UIContextMenuConfiguration(identifier: folder.guid as NSString, previewProvider: nil) { _ in
             UIMenu(title: "", children: [
                 UIAction(
-                    title: "Delete Folder",
+                    title: L10n.string("bookmarks.delete_folder"),
                     image: UIImage(named: "reynard.trash"),
                     attributes: .destructive
                 ) { _ in

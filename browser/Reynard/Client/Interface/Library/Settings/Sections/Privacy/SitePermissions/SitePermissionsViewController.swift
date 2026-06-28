@@ -261,12 +261,12 @@ final class SitePermissionsViewController: SettingsTableViewController {
     private func confirmResetSitePermissions() {
         AlertPresenter.show(
             title: nil,
-            message: "This action will reset permissions for all sites. It cannot be undone.",
+            message: L10n.string("permissions.reset_all_sites_confirm"),
             buttons: [
-                AlertPresenter.Button(title: "OK", style: .destructive) {
+                AlertPresenter.Button(title: L10n.string("common.ok"), style: .destructive) {
                     SiteSettingsUtils.resetStoredSitePermissions()
                 },
-                AlertPresenter.Button(title: "Cancel"),
+                AlertPresenter.Button(title: L10n.string("common.cancel")),
             ]
         )
     }

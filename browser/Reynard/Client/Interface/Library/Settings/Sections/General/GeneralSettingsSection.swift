@@ -35,9 +35,9 @@ struct GeneralSettingsSection {
         case .search:
             return SettingsViewUtils.disclosureCell(title: L10n.string("settings.general.search"))
         case .newTab:
-            return SettingsViewUtils.disclosureCell(title: "New Tab")
+            return SettingsViewUtils.disclosureCell(title: L10n.string("settings.general.new_tab"))
         case .homepage:
-            return SettingsViewUtils.disclosureCell(title: "Homepage")
+            return SettingsViewUtils.disclosureCell(title: L10n.string("common.homepage"))
         case .appearance:
             return SettingsViewUtils.disclosureCell(title: L10n.string("settings.general.appearance"))
         case .compatibility:

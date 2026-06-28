@@ -45,33 +45,33 @@ final class PerformanceRecommendationViewController: UIViewController, HomepageR
         case installTrollStore
         
         var title: String {
-            return "Performance Recommendation"
+            return L10n.string("recommendations.performance.title")
         }
         
         var message: String {
             switch self {
             case .enableInAppJIT:
-                return "Enable JIT to improve performance and ensure websites work properly."
+                return L10n.string("recommendations.performance.enable_jit_message")
             case .installTrollStore:
-                return "Install the TrollStore version of Reynard to enable JIT automatically for improved performance and to ensure websites work properly."
+                return L10n.string("recommendations.performance.install_trollstore_message")
             }
         }
         
         var primaryButtonTitle: String {
             switch self {
             case .enableInAppJIT:
-                return "Learn More"
+                return L10n.string("common.learn_more")
             case .installTrollStore:
-                return "Install TrollStore"
+                return L10n.string("recommendations.performance.install_trollstore")
             }
         }
         
         var secondaryButtonTitle: String {
             switch self {
             case .enableInAppJIT:
-                return "Open Settings"
+                return L10n.string("permissions.open_settings")
             case .installTrollStore:
-                return "Download Reynard (.tipa)"
+                return L10n.string("recommendations.performance.download_tipa")
             }
         }
         
@@ -125,7 +125,7 @@ final class PerformanceRecommendationViewController: UIViewController, HomepageR
         label.font = UIFontMetrics(forTextStyle: .title2).scaledFont(
             for: .systemFont(ofSize: UX.titleFontSize, weight: .bold)
         )
-        label.text = "Performance Recommendation"
+        label.text = L10n.string("recommendations.performance.title")
         label.textAlignment = .left
         label.textColor = .label
         label.numberOfLines = 0
@@ -136,7 +136,7 @@ final class PerformanceRecommendationViewController: UIViewController, HomepageR
     private let messageLabel: UILabel = {
         let label = UILabel()
         label.font = .preferredFont(forTextStyle: .body)
-        label.text = "Enable JIT to improve performance and ensure websites work properly."
+        label.text = L10n.string("recommendations.performance.enable_jit_message")
         label.textAlignment = .left
         label.textColor = .secondaryLabel
         label.numberOfLines = 0
@@ -162,7 +162,7 @@ final class PerformanceRecommendationViewController: UIViewController, HomepageR
     
     private lazy var primaryActionButton: UIButton = {
         return makeActionButton(
-            title: "Learn More",
+            title: L10n.string("common.learn_more"),
             imageName: "reynard.arrow.up.right",
             action: #selector(performPrimaryAction)
         )
@@ -170,7 +170,7 @@ final class PerformanceRecommendationViewController: UIViewController, HomepageR
     
     private lazy var secondaryActionButton: UIButton = {
         return makeActionButton(
-            title: "Open Settings",
+            title: L10n.string("permissions.open_settings"),
             imageName: "reynard.gearshape",
             action: #selector(performSecondaryAction)
         )

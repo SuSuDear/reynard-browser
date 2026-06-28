@@ -26,7 +26,7 @@ struct PrivacySettingsSection {
         case .sitePermissions:
             return SettingsViewUtils.disclosureCell(title: L10n.string("permissions.site_permissions"))
         case .clearBrowsingData:
-            return SettingsViewUtils.disclosureCell(title: "Clear Browsing Data")
+            return SettingsViewUtils.disclosureCell(title: L10n.string("clear_data.clear_browsing_data"))
         }
     }
     

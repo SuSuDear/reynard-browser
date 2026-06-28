@@ -16,9 +16,9 @@ final class BrowsingPreferencesViewController: SettingsTableViewController {
         var text: SettingsSectionText {
             switch self {
             case .links:
-                return SettingsSectionText(headerTitle: "Links")
+                return SettingsSectionText(headerTitle: L10n.string("settings.browsing.links"))
             case .media:
-                return SettingsSectionText(headerTitle: "Media")
+                return SettingsSectionText(headerTitle: L10n.string("settings.browsing.media"))
             case .desktopWebsite:
                 return SettingsSectionText(headerTitle: L10n.string("settings.browsing.request_desktop_on"))
             }
@@ -92,8 +92,8 @@ final class BrowsingPreferencesViewController: SettingsTableViewController {
             guard LinksRow.allCases.indices.contains(indexPath.row) else { return UITableViewCell() }
             let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
             cell.selectionStyle = .none
-            cell.textLabel?.text = "Show Link Previews"
-            cell.detailTextLabel?.text = "When long-pressing links"
+            cell.textLabel?.text = L10n.string("settings.browsing.show_link_previews")
+            cell.detailTextLabel?.text = L10n.string("settings.browsing.link_previews_footer")
             cell.detailTextLabel?.textColor = .secondaryLabel
             cell.accessoryView = showLinkPreviewsSwitch
             return cell
@@ -102,7 +102,7 @@ final class BrowsingPreferencesViewController: SettingsTableViewController {
             switch MediaRow.allCases[indexPath.row] {
             case .autoplay:
                 let cell = UITableViewCell(style: .value1, reuseIdentifier: nil)
-                cell.textLabel?.text = "Autoplay"
+                cell.textLabel?.text = L10n.string("permissions.autoplay")
                 cell.detailTextLabel?.text = SiteSettingsUtils.actionTitle(
                     for: SiteSettingsUtils.defaultAction(for: .autoplay),
                     permission: .autoplay
@@ -112,8 +112,8 @@ final class BrowsingPreferencesViewController: SettingsTableViewController {
             case .showImagePreviews:
                 let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
                 cell.selectionStyle = .none
-                cell.textLabel?.text = "Show Image Previews"
-                cell.detailTextLabel?.text = "When long-pressing images"
+                cell.textLabel?.text = L10n.string("settings.browsing.show_image_previews")
+                cell.detailTextLabel?.text = L10n.string("settings.browsing.image_previews_footer")
                 cell.detailTextLabel?.textColor = .secondaryLabel
                 cell.accessoryView = showImagePreviewsSwitch
                 return cell
@@ -140,7 +140,7 @@ final class BrowsingPreferencesViewController: SettingsTableViewController {
             switch MediaRow.allCases[indexPath.row] {
             case .autoplay:
                 navigationController?.pushViewController(
-                    SitePermissionDetailsViewController(permission: .autoplay, title: "Autoplay"),
+                    SitePermissionDetailsViewController(permission: .autoplay, title: L10n.string("permissions.autoplay")),
                     animated: true
                 )
             case .showImagePreviews:

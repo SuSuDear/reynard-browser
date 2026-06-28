@@ -15,9 +15,9 @@ final class SearchPreferencesViewController: SettingsTableViewController {
         var text: SettingsSectionText {
             switch self {
             case .searchEngine:
-                return SettingsSectionText(headerTitle: "Search Engine")
+                return SettingsSectionText(headerTitle: L10n.string("settings.search.engine"))
             case .searchSuggestions:
-                return SettingsSectionText(headerTitle: "Search Suggestions")
+                return SettingsSectionText(headerTitle: L10n.string("settings.search.suggestions"))
             }
         }
     }
@@ -106,18 +106,18 @@ final class SearchPreferencesViewController: SettingsTableViewController {
             
             switch SearchSuggestionsRow.allCases[indexPath.row] {
             case .showSearchSuggestions:
-                return switchCell(title: "Show Search Suggestions", accessoryView: showSearchSuggestionsSwitch)
+                return switchCell(title: L10n.string("settings.search.show_suggestions"), accessoryView: showSearchSuggestionsSwitch)
             case .showInPrivateBrowsing:
-                return switchCell(title: "Show in Private Browsing", accessoryView: showInPrivateBrowsingSwitch)
+                return switchCell(title: L10n.string("settings.search.show_in_private_browsing"), accessoryView: showInPrivateBrowsingSwitch)
             case .searchBrowsingHistory:
-                return switchCell(title: "Search Browsing History", accessoryView: searchBrowsingHistorySwitch)
+                return switchCell(title: L10n.string("settings.search.search_browsing_history"), accessoryView: searchBrowsingHistorySwitch)
             case .searchBookmarks:
-                return switchCell(title: "Search Bookmarks", accessoryView: searchBookmarksSwitch)
+                return switchCell(title: L10n.string("settings.search.search_bookmarks"), accessoryView: searchBookmarksSwitch)
             case .searchOpenedTabs:
-                return switchCell(title: "Search Opened Tabs", accessoryView: searchOpenedTabsSwitch)
+                return switchCell(title: L10n.string("settings.search.search_opened_tabs"), accessoryView: searchOpenedTabsSwitch)
             case .searchSuggestionProvider:
                 let cell = UITableViewCell(style: .value1, reuseIdentifier: nil)
-                cell.textLabel?.text = "Search Suggestion Provider"
+                cell.textLabel?.text = L10n.string("settings.search.suggestion_provider")
                 cell.detailTextLabel?.text = Prefs.SearchSettings.searchSuggestionProvider.name
                 cell.detailTextLabel?.textColor = .secondaryLabel
                 cell.accessoryType = .disclosureIndicator

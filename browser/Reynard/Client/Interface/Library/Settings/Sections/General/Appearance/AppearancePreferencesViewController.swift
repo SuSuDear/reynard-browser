@@ -19,11 +19,11 @@ final class AppearancePreferencesViewController: SettingsTableViewController {
             case .appAppearance:
                 return SettingsSectionText()
             case .addressBar:
-                return SettingsSectionText(headerTitle: "Address Bar")
+                return SettingsSectionText(headerTitle: L10n.string("settings.appearance.address_bar"))
             case .tabs:
                 return SettingsSectionText(headerTitle: L10n.string("settings.appearance.tabs"))
             case .pageZoom:
-                return SettingsSectionText(headerTitle: "Page Zoom")
+                return SettingsSectionText(headerTitle: L10n.string("settings.appearance.page_zoom"))
             }
         }
 
@@ -121,7 +121,7 @@ final class AppearancePreferencesViewController: SettingsTableViewController {
             return cell
         case .showFullWebsiteAddress:
             let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
-            cell.textLabel?.text = "Show Full Website Address"
+            cell.textLabel?.text = L10n.string("settings.appearance.show_full_website_address")
             cell.selectionStyle = .none
             cell.accessoryView = showFullWebsiteAddressSwitch
             return cell
@@ -133,7 +133,7 @@ final class AppearancePreferencesViewController: SettingsTableViewController {
             return cell
         case .pageZoom:
             let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
-            cell.textLabel?.text = "Zoom Settings"
+            cell.textLabel?.text = L10n.string("settings.appearance.zoom_settings")
             cell.accessoryType = .disclosureIndicator
             return cell
         }

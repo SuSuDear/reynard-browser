@@ -59,7 +59,7 @@ final class FavoritesSectionViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = FavoritesSectionViewController.titleFont
         label.textColor = .label
-        label.text = "Favorites"
+        label.text = L10n.string("bookmarks.favorites")
         label.adjustsFontForContentSizeCategory = true
         return label
     }()
@@ -254,7 +254,7 @@ final class FavoritesSectionViewController: UIViewController {
         let isHidden = !showsSectionTitle || !hasExpandableFavorites
         UIView.performWithoutAnimation {
             showAllButton.isHidden = isHidden
-            showAllButton.setTitle(isHidden ? nil : (showsExpandedFavorites ? "Show Less" : "Show All"), for: .normal)
+            showAllButton.setTitle(isHidden ? nil : (showsExpandedFavorites ? L10n.string("common.show_less") : L10n.string("common.show_all")), for: .normal)
             showAllButton.layoutIfNeeded()
         }
     }

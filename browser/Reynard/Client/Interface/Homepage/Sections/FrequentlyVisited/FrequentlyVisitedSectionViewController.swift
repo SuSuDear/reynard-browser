@@ -49,7 +49,7 @@ final class FrequentlyVisitedSectionViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = FrequentlyVisitedSectionViewController.titleFont
         label.textColor = .label
-        label.text = "Frequently Visited"
+        label.text = L10n.string("homepage.frequently_visited")
         label.adjustsFontForContentSizeCategory = true
         return label
     }()

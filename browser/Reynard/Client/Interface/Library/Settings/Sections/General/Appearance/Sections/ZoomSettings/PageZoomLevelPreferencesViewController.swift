@@ -26,7 +26,7 @@ final class PageZoomLevelPreferencesViewController: SettingsTableViewController 
     init(mode: Mode) {
         self.mode = mode
         super.init(style: .insetGrouped)
-        title = "Zoom Level"
+        title = L10n.string("settings.page_zoom.zoom_level")
     }
     
     required init?(coder: NSCoder) {

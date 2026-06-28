@@ -14,7 +14,7 @@ final class NewTabPreferencesViewController: SettingsTableViewController, UIText
         var text: SettingsSectionText {
             switch self {
             case .showOnNewTab:
-                return SettingsSectionText(headerTitle: "Show on New Tab")
+                return SettingsSectionText(headerTitle: L10n.string("settings.new_tab.show_on_new_tab"))
             }
         }
     }
@@ -27,11 +27,11 @@ final class NewTabPreferencesViewController: SettingsTableViewController, UIText
         var title: String {
             switch self {
             case .homepage:
-                return "Homepage"
+                return L10n.string("common.homepage")
             case .blankPage:
-                return "Blank Page"
+                return L10n.string("settings.new_tab.blank_page")
             case .customURL:
-                return "Custom URL"
+                return L10n.string("settings.new_tab.custom_url")
             }
         }
         
@@ -49,7 +49,7 @@ final class NewTabPreferencesViewController: SettingsTableViewController, UIText
     
     init() {
         super.init(style: .insetGrouped)
-        title = "New Tab"
+        title = L10n.string("settings.general.new_tab")
     }
     
     required init?(coder: NSCoder) {

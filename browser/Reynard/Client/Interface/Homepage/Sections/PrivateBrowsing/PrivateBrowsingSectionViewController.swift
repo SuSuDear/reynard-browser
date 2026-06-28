@@ -64,7 +64,7 @@ final class PrivateBrowsingSectionViewController: UIViewController {
         label.font = UIFontMetrics(forTextStyle: .title1).scaledFont(
             for: .systemFont(ofSize: UX.titleFontSize, weight: .bold)
         )
-        label.text = "Private Browsing"
+        label.text = L10n.string("tab_overview.private_browsing")
         label.textAlignment = .center
         label.textColor = .white
         label.numberOfLines = 0

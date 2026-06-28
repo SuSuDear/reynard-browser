@@ -80,7 +80,7 @@ final class RecentlyClosedTabCollectionViewCell: UICollectionViewCell {
     
     func configure(tab: TabManagementStore.RecentlyClosedTabSnapshot) {
         let title = tab.title.trimmingCharacters(in: .whitespacesAndNewlines)
-        titleLabel.text = title.isEmpty ? "Untitled" : title
+        titleLabel.text = title.isEmpty ? L10n.string("common.untitled") : title
     }
     
     // MARK: - Configuration

@@ -79,7 +79,7 @@ final class DonationRecommendationViewController: UIViewController, HomepageReco
         label.font = UIFontMetrics(forTextStyle: .title2).scaledFont(
             for: .systemFont(ofSize: UX.titleFontSize, weight: .bold)
         )
-        label.text = "Support The Project"
+        label.text = L10n.string("recommendations.donation.title")
         label.textAlignment = .left
         label.textColor = .label
         label.numberOfLines = 0
@@ -100,7 +100,7 @@ final class DonationRecommendationViewController: UIViewController, HomepageReco
     
     private lazy var donateButton: UIButton = {
         return makeActionButton(
-            title: "Buy Me a Coffee",
+            title: L10n.string("recommendations.donation.buy_me_a_coffee"),
             imageName: "reynard.arrow.up.right",
             action: #selector(openDonationLink)
         )
@@ -108,7 +108,7 @@ final class DonationRecommendationViewController: UIViewController, HomepageReco
     
     private lazy var notNowButton: UIButton = {
         return makeActionButton(
-            title: "Not Now",
+            title: L10n.string("common.not_now"),
             imageName: "reynard.clock",
             action: #selector(postponeDonationRecommendation)
         )

@@ -158,7 +158,7 @@ final class SiteSettingsViewController: UITableViewController {
         case .availability:
             return nil
         case .media:
-            return "Media"
+            return L10n.string("settings.browsing.media")
         case .permissions:
             return L10n.string("permissions.title")
         }
@@ -419,12 +419,12 @@ final class SiteSettingsViewController: UITableViewController {
     private func confirmResetSitePermissions() {
         AlertPresenter.show(
             title: nil,
-            message: "This action will reset permissions for this site. It cannot be undone.",
+            message: L10n.string("permissions.reset_this_site_confirm"),
             buttons: [
-                AlertPresenter.Button(title: "OK", style: .destructive) { [weak self] in
+                AlertPresenter.Button(title: L10n.string("common.ok"), style: .destructive) { [weak self] in
                     self?.performResetSitePermissions()
                 },
-                AlertPresenter.Button(title: "Cancel"),
+                AlertPresenter.Button(title: L10n.string("common.cancel")),
             ]
         )
     }

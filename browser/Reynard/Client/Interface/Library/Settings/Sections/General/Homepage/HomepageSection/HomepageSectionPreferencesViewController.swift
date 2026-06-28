@@ -41,33 +41,33 @@ final class HomepageSectionPreferencesViewController: SettingsTableViewControlle
         var title: String {
             switch self {
             case .favorites:
-                return "Favorites"
+                return L10n.string("bookmarks.favorites")
             case .frequentlyVisited:
-                return "Frequently Visited"
+                return L10n.string("homepage.frequently_visited")
             case .recentlyClosedTabs:
-                return "Recently Closed Tabs"
+                return L10n.string("homepage.recently_closed_tabs")
             }
         }
         
         var switchTitle: String {
             switch self {
             case .favorites:
-                return "Show Favorites"
+                return L10n.string("settings.homepage.show_favorites")
             case .frequentlyVisited:
-                return "Show Frequently Visited"
+                return L10n.string("settings.homepage.show_frequently_visited")
             case .recentlyClosedTabs:
-                return "Show Recently Closed Tabs"
+                return L10n.string("settings.homepage.show_recently_closed_tabs")
             }
         }
         
         var countTitle: String {
             switch self {
             case .favorites:
-                return "Number of Rows"
+                return L10n.string("settings.homepage.number_of_rows")
             case .frequentlyVisited:
-                return "Number of Sites"
+                return L10n.string("settings.homepage.number_of_sites")
             case .recentlyClosedTabs:
-                return "Number of Items"
+                return L10n.string("settings.homepage.number_of_items")
             }
         }
         
@@ -231,7 +231,7 @@ final class HomepageSectionPreferencesViewController: SettingsTableViewControlle
             return cell
         case .showInPrivateBrowsing:
             let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
-            cell.textLabel?.text = "Show in Private Browsing"
+            cell.textLabel?.text = L10n.string("settings.search.show_in_private_browsing")
             cell.selectionStyle = .none
             cell.accessoryView = privateBrowsingSwitch
             return cell
