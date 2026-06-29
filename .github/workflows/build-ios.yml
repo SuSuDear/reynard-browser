@@ -25,6 +25,10 @@ on:
         description: 'Existing tag to publish as a GitHub Release'
         required: false
         type: string
+      release_notes:
+        description: 'Release notes for the GitHub Release body'
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -373,12 +377,7 @@ jobs:
           tag_name: ${{ inputs.release_tag || github.ref_name }}
           target_commitish: ${{ github.sha }}
           files: browser/build/Build/Products/Release-iphoneos/Reynard-TrollStore.tipa
-          body: |
-            添加中文支持
-            增加滑动删除卡片
-            增加高帧率适配
-            优化卡片快照到主视图弹跳
-            对书签页面添加记忆
+          body: ${{ inputs.release_notes || github.event.head_commit.message || github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
