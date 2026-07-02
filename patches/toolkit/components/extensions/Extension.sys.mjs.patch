@@ -31,3 +31,12 @@ index c8cb26a405d1..a090ab07b5cd 100644
    _processSpawningDisabled: false,
  
    // Technically there is at most one child extension process,
+@@ -3892,7 +3892,7 @@ export class Extension extends ExtensionData {
+       let locales = await this.promiseLocales();
+
+       let matches = Services.locale.negotiateLanguages(
+-        Services.locale.appLocalesAsBCP47,
++        ["zh-CN", "zh", ...Services.locale.appLocalesAsBCP47],
+         Array.from(locales.keys()),
+         this.defaultLocale
+       );

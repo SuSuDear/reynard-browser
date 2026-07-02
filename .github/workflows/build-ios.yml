@@ -42,9 +42,7 @@ jobs:
 
     env:
       FIREFOX_RELEASE_TAG_FILE: engine/release.txt
-      USE_PREBUILT_GECKO: 'true'
-      GECKO_DIST_URL: https://github.com/SuSuDear/gecko-ios-builder/releases/download/gecko-ios-aarch64-portable/gecko-ios-aarch64-dist.tar.zst
-      GECKO_DIST_SHA256: b5704840d34a36f70e1300b104d11d87cbd3bcc5115c71437752f57129aaaccd
+      USE_PREBUILT_GECKO: 'false'
       # Firefox 151's mobile/ios target requires iOS SDK >= 26.4, which only
       # ships in Xcode 26+. macos-26 runner has Xcode 26.4.1 as default.
       MACH_BUILD_PYTHON_NATIVE_PACKAGE_SOURCE: system
@@ -213,42 +211,6 @@ jobs:
           fi
           echo "Gecko dist/bin contents:"
           ls -la "$OBJDIR/dist/bin" | head -40
-
-      - name: Download and extract prebuilt Gecko dist
-        if: ${{ env.USE_PREBUILT_GECKO == 'true' }}
-        run: |
-          set -euo pipefail
-          mkdir -p _gecko-artifact
-          ARTIFACT="_gecko-artifact/gecko-ios-aarch64-dist.tar.zst"
-          curl --fail --location \
-            "$GECKO_DIST_URL" \
-            --output "$ARTIFACT"
-
-          ACTUAL_SHA256="$(shasum -a 256 "$ARTIFACT" | awk '{print $1}')"
-          if [ "$ACTUAL_SHA256" != "$GECKO_DIST_SHA256" ]; then
-            echo "::error::Unexpected Gecko dist sha256: $ACTUAL_SHA256"
-            exit 1
-          fi
-
-          OBJDIR="engine/firefox/obj-aarch64-apple-ios"
-          rm -rf "$OBJDIR/dist"
-          mkdir -p "$OBJDIR"
-          tar --zstd -xf "$ARTIFACT" -C "$OBJDIR"
-
-          if [ ! -d "$OBJDIR/dist/bin" ]; then
-            echo "::error::Downloaded Gecko artifact did not produce $OBJDIR/dist/bin"
-            exit 1
-          fi
-          echo "Prebuilt Gecko dist/bin contents:"
-          ls -la "$OBJDIR/dist/bin" | head -40
-
-          echo "Prebuilt Gecko Swift bridge headers:"
-          find "$OBJDIR/dist/include" \
-            \( -name 'GeckoViewSwiftSupport.h' -o -name 'IOSBootstrap.h' -o -name 'GeckoViewRuntimeSupport.h' \) \
-            -print | sort
-
-          echo "Top-level prebuilt Gecko dist/bin symlinks:"
-          find "$OBJDIR/dist/bin" -maxdepth 1 -type l -ls | head -40 || true
 
       - name: Run xcodebuild (unsigned)
         working-directory: browser

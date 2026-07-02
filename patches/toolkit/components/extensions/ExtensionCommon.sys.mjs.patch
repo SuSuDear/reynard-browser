@@ -1,0 +1,13 @@
+diff --git a/toolkit/components/extensions/ExtensionCommon.sys.mjs b/toolkit/components/extensions/ExtensionCommon.sys.mjs
+index 3d770f6a9e3..c9c246f7ad9 100644
+--- a/toolkit/components/extensions/ExtensionCommon.sys.mjs
++++ b/toolkit/components/extensions/ExtensionCommon.sys.mjs
+@@ -2206,7 +2206,7 @@ export const LocaleData = {
+   },
+
+   get uiLocale() {
+-    return Services.locale.appLocaleAsBCP47;
++    return "zh-CN";
+   },
+
+   get availableLocales() {
